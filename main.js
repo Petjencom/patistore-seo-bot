@@ -53,7 +53,7 @@ function loadHistory() {
   if (fs.existsSync(HISTORY_FILE)) {
     try { return JSON.parse(fs.readFileSync(HISTORY_FILE, 'utf-8')); } catch (e) {}
   }
-  return { published_slugs: [], last_run: null };
+  return { published_slugs: [], last_run: null, last_type: 'local' };
 }
 
 function saveHistory(history) {
@@ -186,7 +186,7 @@ async function generateThreeImages(topic) {
   const imageConfigs = [
     {
       suffix: 'ana-rehber',
-      alt: `${focusKw}`, // Exact Focus Keyword for RankMath
+      alt: `${focusKw}`,
       caption: `${title} uzman rehberi`,
       aiPrompt: `Award-winning hyperrealistic 8k studio photo of ${focusKw}, horizontal landscape 16:9, volumetric soft studio lighting, ultra sharp focus, detailed fur texture, Hasselblad photography, clean modern background`
     },
@@ -213,7 +213,6 @@ async function generateThreeImages(topic) {
 
     let buffer = null;
 
-    // Generate via AI Image Generator (Flux.1 / 1200x675 Landscape)
     try {
       const encoded = encodeURIComponent(cfg.aiPrompt);
       const aiUrl = `https://image.pollinations.ai/prompt/${encoded}?width=1200&height=675&nologo=true&model=flux`;
@@ -358,15 +357,16 @@ ${internalLinks || "https://www.patistore.net/pet-kuafor/"}
   return null;
 }
 
-// 5. Main Execution Engine
-async function runDailyBatch(count = 5, status = 'publish') {
+// 5. Main Execution Engine (Hourly / Batch)
+async function runBatch(count = 1, status = 'publish') {
   console.log('================================================================');
-  console.log(`🐾 Patistore.net 3-Yatay AI Görselli 2500+ Kelime & RankMath 100/100 Botu`);
+  console.log(`🐾 Patistore.net SAATLİK 1 İÇERİK (RankMath 100/100) Otomasyonu`);
   console.log(`Hedef: ${count} Adet Kapsamlı İçerik | Durum: ${status}`);
   console.log('================================================================\n');
 
   const history = loadHistory();
   const publishedSlugs = new Set(history.published_slugs || []);
+  let lastType = history.last_type || 'local';
 
   const cities = loadJson('cities_districts.json').cities;
   const services = loadJson('services.json').services;
@@ -392,17 +392,34 @@ async function runDailyBatch(count = 5, status = 'publish') {
             city: city.name,
             district: district,
             service: srv.name,
-            slug_key: key
+            slug_key: key,
+            type: 'local'
           });
         }
       }
     }
   }
 
-  const selectedTasks = [
-    ...evergreenPool.slice(0, 2),
-    ...localTasks.slice(0, 3)
-  ].slice(0, count);
+  const selectedTasks = [];
+
+  for (let i = 0; i < count; i++) {
+    // Alternate between evergreen and local for hourly variety
+    if (lastType === 'local' && evergreenPool.length > 0) {
+      const task = evergreenPool.shift();
+      task.type = 'evergreen';
+      selectedTasks.push(task);
+      lastType = 'evergreen';
+    } else if (localTasks.length > 0) {
+      const task = localTasks.shift();
+      selectedTasks.push(task);
+      lastType = 'local';
+    } else if (evergreenPool.length > 0) {
+      const task = evergreenPool.shift();
+      task.type = 'evergreen';
+      selectedTasks.push(task);
+      lastType = 'evergreen';
+    }
+  }
 
   let successCount = 0;
 
@@ -412,6 +429,7 @@ async function runDailyBatch(count = 5, status = 'publish') {
 
     console.log(`\n----------------------------------------------------------------`);
     console.log(`[${i + 1}/${selectedTasks.length}] Üretiliyor: "${task.title}"`);
+    console.log(`    -> Tür: ${task.type === 'evergreen' ? 'Irk/Beslenme Rehberi' : 'İl/İlçe Yerel Hizmet Rehberi'}`);
     console.log(`    -> Odak Kelime: "${task.focus_keyword}"`);
     console.log(`    -> Kalıcı Bağlantı: "${exactSlug}"`);
 
@@ -487,15 +505,16 @@ async function runDailyBatch(count = 5, status = 'publish') {
 
   history.published_slugs = Array.from(publishedSlugs);
   history.last_run = new Date().toISOString();
+  history.last_type = lastType;
   saveHistory(history);
 
   console.log('\n================================================================');
-  console.log(`🎉 TÜM İÇERİKLER TAMAMLANDI! Başarılı: ${successCount}/${selectedTasks.length}`);
+  console.log(`🎉 SAATLİK GÖREV TAMAMLANDI! Başarılı: ${successCount}/${selectedTasks.length}`);
   console.log('================================================================');
 }
 
 const args = process.argv.slice(2);
-const countArg = parseInt(args.find(a => a.startsWith('--count='))?.split('=')[1] || '5');
+const countArg = parseInt(args.find(a => a.startsWith('--count='))?.split('=')[1] || '1');
 const statusArg = args.find(a => a.startsWith('--status='))?.split('=')[1] || 'publish';
 
-runDailyBatch(countArg, statusArg);
+runBatch(countArg, statusArg);
