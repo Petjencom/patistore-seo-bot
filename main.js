@@ -1,3 +1,4 @@
+const { generateEditorialSvgBanner } = require('./banner_generator');
 const fs = require('fs');
 const path = require('path');
 
@@ -116,15 +117,16 @@ async function getOrCreateCategory(categoryName) {
   return 1;
 }
 
-// Upload Media to WordPress
-async function uploadImage(imageBuffer, filename, altText, caption) {
+
+// Upload Media to WordPress (Supports SVG, JPEG, PNG)
+async function uploadImage(imageBuffer, filename, altText, caption, contentType = 'image/jpeg') {
   try {
     const uploadRes = await fetch(`${WP_URL}/wp-json/wp/v2/media`, {
       method: 'POST',
       headers: {
         'Authorization': AUTH_HEADER,
         'Content-Disposition': `attachment; filename="${filename}"`,
-        'Content-Type': 'image/jpeg'
+        'Content-Type': contentType
       },
       body: imageBuffer
     });
@@ -143,8 +145,10 @@ async function uploadImage(imageBuffer, filename, altText, caption) {
           description: altText
         })
       });
-      console.log(`[+] Crystal-Clear 16:9 HD Görsel Yüklendi: ${filename} (ID: ${media.id}) - Alt: '${altText}'`);
+      console.log(`[+] Başlık Yazılı 16:9 HD Görsel Yüklendi: ${filename} (ID: ${media.id}) - Alt: '${altText}'`);
       return { id: media.id, source_url: media.source_url || media.guid?.rendered };
+    } else {
+      console.error('[-] Media Upload Error:', await uploadRes.text());
     }
   } catch (e) {
     console.error(`[-] Görsel yükleme hatası (${filename}):`, e.message);
@@ -152,230 +156,62 @@ async function uploadImage(imageBuffer, filename, altText, caption) {
   return null;
 }
 
-// Generate Exactly 2 Ultra-HD Images (1 Cover + 1 In-Content, 1200x675) with 100% Exact Breed & Service Match
-async function generateUltraHDImages(topic, imagePrompts = []) {
+
+
+// Generate Exactly 2 Ultra-HD Images (1 Featured Cover + 1 In-Content, 1200x675) with Custom Title Typography
+async function generateUltraHDImages(topic, articleTitle) {
   const focusKw = topic.focus_keyword;
   const baseSlug = slugifyTurkish(focusKw);
-
-  // 100% Verified, Exact Breed & Service High-Resolution Photo Library (1200x675 16:9)
-  const verifiedLibrary = {
-    // === KÖPEK IRKLARI (HER BİRİ KENDİNE ÖZEL GERÇEK FOTOĞRAF) ===
-    "pomeranian": [
-      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1546975490-a79abdd54533?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "french_bulldog": [
-      "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1583511655826-05700d52f4d9?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "golden_retriever": [
-      "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1633722715463-d30f4f325e24?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "labrador": [
-      "https://images.unsplash.com/photo-1591769225440-811ad7d6eab2?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "maltese": [
-      "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "poodle": [
-      "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "cane_corso": [
-      "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "rottweiler": [
-      "https://images.unsplash.com/photo-1567752881298-894bb81f9379?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "husky": [
-      "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "chihuahua": [
-      "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "kangal": [
-      "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "alman_kurdu": [
-      "https://images.unsplash.com/photo-1589941013453-ec89f33b5455?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-
-    // === KEDİ IRKLARI ===
-    "british_shorthair": [
-      "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "scottish_fold": [
-      "https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "siyam": [
-      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "van_kedisi": [
-      "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "maine_coon": [
-      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "ragdoll": [
-      "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "bengal": [
-      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "iran_kedisi": [
-      "https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "sphynx": [
-      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "tekir": [
-      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-
-    // === HİZMET VE BAKIM KATEGORİLERİ ===
-    "pet_taksi": [
-      "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "pet_otel": [
-      "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "pet_kuafor": [
-      "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1535294435445-d7249524ef2e?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "veteriner": [
-      "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "pet_shop": [
-      "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "dog_general": [
-      "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&h=675&q=85"
-    ],
-    "cat_general": [
-      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85",
-      "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=85"
-    ]
-  };
-
-  const textToSearch = (topic.title + ' ' + topic.focus_keyword + ' ' + (topic.category || '')).toLowerCase();
-  let selectedUrls = verifiedLibrary.dog_general;
-
-  // Strict Keyword Specific Mapping (Priority Matrix)
-  if (textToSearch.includes("pomeranian") || textToSearch.includes("boo")) {
-    selectedUrls = verifiedLibrary.pomeranian;
-  } else if (textToSearch.includes("french bulldog") || textToSearch.includes("fransız bulldog") || textToSearch.includes("buldog")) {
-    selectedUrls = verifiedLibrary.french_bulldog;
-  } else if (textToSearch.includes("golden")) {
-    selectedUrls = verifiedLibrary.golden_retriever;
-  } else if (textToSearch.includes("labrador")) {
-    selectedUrls = verifiedLibrary.labrador;
-  } else if (textToSearch.includes("maltese") || textToSearch.includes("maltez")) {
-    selectedUrls = verifiedLibrary.maltese;
-  } else if (textToSearch.includes("poodle") || textToSearch.includes("kaniş") || textToSearch.includes("toypoodle")) {
-    selectedUrls = verifiedLibrary.poodle;
-  } else if (textToSearch.includes("cane corso")) {
-    selectedUrls = verifiedLibrary.cane_corso;
-  } else if (textToSearch.includes("rottweiler")) {
-    selectedUrls = verifiedLibrary.rottweiler;
-  } else if (textToSearch.includes("husky") || textToSearch.includes("sibirya kurdu")) {
-    selectedUrls = verifiedLibrary.husky;
-  } else if (textToSearch.includes("chihuahua") || textToSearch.includes("şivava")) {
-    selectedUrls = verifiedLibrary.chihuahua;
-  } else if (textToSearch.includes("kangal")) {
-    selectedUrls = verifiedLibrary.kangal;
-  } else if (textToSearch.includes("alman kurdu") || textToSearch.includes("shepherd")) {
-    selectedUrls = verifiedLibrary.alman_kurdu;
-  } else if (textToSearch.includes("british")) {
-    selectedUrls = verifiedLibrary.british_shorthair;
-  } else if (textToSearch.includes("scottish")) {
-    selectedUrls = verifiedLibrary.scottish_fold;
-  } else if (textToSearch.includes("siyam")) {
-    selectedUrls = verifiedLibrary.siyam;
-  } else if (textToSearch.includes("van kedisi")) {
-    selectedUrls = verifiedLibrary.van_kedisi;
-  } else if (textToSearch.includes("maine coon")) {
-    selectedUrls = verifiedLibrary.maine_coon;
-  } else if (textToSearch.includes("ragdoll")) {
-    selectedUrls = verifiedLibrary.ragdoll;
-  } else if (textToSearch.includes("bengal")) {
-    selectedUrls = verifiedLibrary.bengal;
-  } else if (textToSearch.includes("iran") || textToSearch.includes("persian")) {
-    selectedUrls = verifiedLibrary.iran_kedisi;
-  } else if (textToSearch.includes("sphynx") || textToSearch.includes("tüysüz")) {
-    selectedUrls = verifiedLibrary.sphynx;
-  } else if (textToSearch.includes("tekir")) {
-    selectedUrls = verifiedLibrary.tekir;
-  } else if (textToSearch.includes("taksi") || textToSearch.includes("taxi") || textToSearch.includes("transfer")) {
-    selectedUrls = verifiedLibrary.pet_taksi;
-  } else if (textToSearch.includes("otel") || textToSearch.includes("pansiyon") || textToSearch.includes("konaklama")) {
-    selectedUrls = verifiedLibrary.pet_otel;
-  } else if (textToSearch.includes("kuaför") || textToSearch.includes("kuafor") || textToSearch.includes("tıraş") || textToSearch.includes("banyo")) {
-    selectedUrls = verifiedLibrary.pet_kuafor;
-  } else if (textToSearch.includes("veteriner") || textToSearch.includes("aşı") || textToSearch.includes("klinik") || textToSearch.includes("kısırlaştırma") || textToSearch.includes("muayene")) {
-    selectedUrls = verifiedLibrary.veteriner;
-  } else if (textToSearch.includes("shop") || textToSearch.includes("mama") || textToSearch.includes("kum") || textToSearch.includes("ürün")) {
-    selectedUrls = verifiedLibrary.pet_shop;
-  } else if (textToSearch.includes("kedi")) {
-    selectedUrls = verifiedLibrary.cat_general;
-  } else {
-    selectedUrls = verifiedLibrary.dog_general;
-  }
-
-  const configs = imagePrompts.length === 2 ? imagePrompts : [
-    { alt: `${focusKw}`, caption: `${topic.title} uzman rehberi` },
-    { alt: `${focusKw} detaylı incelemesi`, caption: `${focusKw} için uzman önerileri ve rehber` }
-  ];
+  const cleanKw = focusKw.charAt(0).toUpperCase() + focusKw.slice(1);
+  const finalTitle = articleTitle || `${cleanKw}: 2026 Kapsamlı Uzman Rehberi`;
 
   const results = [];
 
-  for (let idx = 0; idx < configs.length; idx++) {
-    const cfg = configs[idx];
-    const filename = `${baseSlug}-gorsel-${idx + 1}-patistore.jpg`;
-    console.log(`    [*] Crystal-Clear HD Görsel ${idx + 1}/2 Yükleniyor (1200x675 16:9): "${cfg.alt}"`);
-
-    const targetUrl = selectedUrls[idx % selectedUrls.length];
-    try {
-      const res = await fetch(targetUrl);
-      if (res.ok) {
-        const buffer = Buffer.from(await res.arrayBuffer());
-        const uploaded = await uploadImage(buffer, filename, cfg.alt, cfg.caption);
-        if (uploaded) {
-          results.push({
-            id: uploaded.id,
-            url: uploaded.source_url,
-            alt: cfg.alt,
-            caption: cfg.caption
-          });
-        }
-      }
-    } catch (e) {
-      console.error(`Görsel ${idx + 1} indirilemedi:`, e.message);
+  // 1. ÖNE ÇIKAN KAPAK GÖRSELİ (Üzerinde Odak Anahtar Kelime ve Konu Başlığı Yazan 1200x675 HD Grafik)
+  console.log(`    [*] 1. Öne Çıkan Kapak Görseli Hazırlanıyor (Başlık Baskılı): "${focusKw}"`);
+  try {
+    const coverBuffer = generateEditorialSvgBanner({
+      title: cleanKw,
+      badge: '🐾 PATISTORE UZMAN REHBERİ',
+      subtitle: finalTitle,
+      isCover: true
+    });
+    const coverFilename = `${baseSlug}-kapak-gorseli-patistore.svg`;
+    const uploadedCover = await uploadImage(coverBuffer, coverFilename, focusKw, finalTitle, 'image/svg+xml');
+    if (uploadedCover) {
+      results.push({
+        id: uploadedCover.id,
+        url: uploadedCover.source_url,
+        alt: focusKw,
+        caption: finalTitle
+      });
     }
+  } catch (e) {
+    console.error('Kapak görseli oluşturulamadı:', e.message);
+  }
+
+  // 2. İÇERİK İÇİ GÖRSEL (Üzerinde Alternatif Odak / Detay Başlığı Yazan 1200x675 HD Grafik)
+  const inContentSubtitle = `${cleanKw} İçin 2026 Veteriner Hekim Tavsiyeleri ve Bakım İpuçları`;
+  console.log(`    [*] 2. İçerik İçi Görsel Hazırlanıyor (Detay Başlıklı): "${focusKw} detaylı rehber"`);
+  try {
+    const contentBuffer = generateEditorialSvgBanner({
+      title: `${cleanKw} Rehberi`,
+      badge: '⭐ KLİNİK ANALİZ &amp; TAVSİYELER',
+      subtitle: inContentSubtitle,
+      isCover: false
+    });
+    const contentFilename = `${baseSlug}-detay-rehberi-patistore.svg`;
+    const uploadedContent = await uploadImage(contentBuffer, contentFilename, `${focusKw} detaylı rehber`, inContentSubtitle, 'image/svg+xml');
+    if (uploadedContent) {
+      results.push({
+        id: uploadedContent.id,
+        url: uploadedContent.source_url,
+        alt: `${focusKw} detaylı rehber`,
+        caption: inContentSubtitle
+      });
+    }
+  } catch (e) {
+    console.error('İçerik görseli oluşturulamadı:', e.message);
   }
 
   return results;
@@ -651,7 +487,7 @@ async function runBot(options = {}) {
 
   // 2. Generate 2 Crystal-Clear Editorial HD Images (1 Cover + 1 In-Content)
   console.log(`    [*] Konuyla %100 Örtüşen 2 Crystal-Clear HD Görsel Yükleniyor (1 Kapak + 1 İçerik İçi)...`);
-  const uploadedImages = await generateUltraHDImages(task, article.image_prompts || []);
+  const uploadedImages = await generateUltraHDImages(task, article.title);
   const featuredMediaId = uploadedImages[0]?.id;
   const inContentImage = uploadedImages[1];
 
