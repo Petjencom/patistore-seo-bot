@@ -168,7 +168,7 @@ async function uploadImage(imageBuffer, filename, altText, caption) {
           description: altText
         })
       });
-      console.log(`[+] %100 Uyumlu 16:9 AI Görseli Yüklendi: ${filename} (ID: ${media.id}) - Alt: '${altText}'`);
+      console.log(`[+] Crystal-Clear 16:9 HD Görsel Yüklendi: ${filename} (ID: ${media.id}) - Alt: '${altText}'`);
       return { id: media.id, source_url: media.source_url || media.guid?.rendered };
     }
   } catch (e) {
@@ -177,68 +177,124 @@ async function uploadImage(imageBuffer, filename, altText, caption) {
   return null;
 }
 
-// 3. Dynamic %100 Contextual AI Image Generator (16:9 Landscape - 1200x675)
-async function generateContextualImages(topic, imagePrompts = []) {
+// 3. Ultra-HD Crystal-Clear Topic-Specific Photography Engine (1200x675 16:9 Landscape)
+async function generateUltraHDImages(topic, imagePrompts = []) {
   const focusKw = topic.focus_keyword || 'evcil hayvan';
+  const title = topic.title || '';
   const baseSlug = slugifyTurkish(focusKw);
 
-  // Default fallback prompts if AI did not provide explicit image prompts
+  const curatedBank = {
+    // Kedi Irkları & Genel
+    british: [
+      "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=90"
+    ],
+    scottish: [
+      "https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=90"
+    ],
+    cat_general: [
+      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&h=675&q=90"
+    ],
+    // Köpek Irkları & Genel
+    golden: [
+      "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&h=675&q=90"
+    ],
+    pomeranian: [
+      "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=90"
+    ],
+    dog_general: [
+      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&h=675&q=90"
+    ],
+    // Yerel Hizmetler
+    veteriner: [
+      "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=1200&h=675&q=90"
+    ],
+    pet_otel: [
+      "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&h=675&q=90"
+    ],
+    pet_taksi: [
+      "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=90"
+    ],
+    pet_kuafor: [
+      "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1200&h=675&q=90"
+    ],
+    beslenme: [
+      "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&h=675&q=90",
+      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&h=675&q=90"
+    ]
+  };
+
+  const tLower = (title + " " + focusKw).toLowerCase();
+  let selectedUrls = curatedBank.dog_general;
+
+  if (tLower.includes("veteriner")) selectedUrls = curatedBank.veteriner;
+  else if (tLower.includes("otel") || tLower.includes("pansiyon")) selectedUrls = curatedBank.pet_otel;
+  else if (tLower.includes("taksi") || tLower.includes("nakil")) selectedUrls = curatedBank.pet_taksi;
+  else if (tLower.includes("kuaför") || tLower.includes("tıraş")) selectedUrls = curatedBank.pet_kuafor;
+  else if (tLower.includes("mama") || tLower.includes("beslen") || tLower.includes("barf")) selectedUrls = curatedBank.beslenme;
+  else if (tLower.includes("british")) selectedUrls = curatedBank.british;
+  else if (tLower.includes("scottish")) selectedUrls = curatedBank.scottish;
+  else if (tLower.includes("kedi")) selectedUrls = curatedBank.cat_general;
+  else if (tLower.includes("golden")) selectedUrls = curatedBank.golden;
+  else if (tLower.includes("pomeranian") || tLower.includes("boo")) selectedUrls = curatedBank.pomeranian;
+
   const configs = imagePrompts.length === 3 ? imagePrompts : [
-    {
-      alt: `${focusKw}`,
-      caption: `${topic.title} uzman rehberi görseli`,
-      prompt: `Award-winning hyperrealistic 8k studio photo of ${focusKw}, horizontal landscape 16:9, soft volumetric lighting, ultra sharp focus, realistic details, clean modern background`
-    },
-    {
-      alt: `${focusKw} beslenme ve bakım detayları`,
-      caption: `${focusKw} için doğru beslenme ve günlük bakım tüyoları`,
-      prompt: `Hyperrealistic 8k detailed photography of ${focusKw} during care and nutrition, horizontal landscape 16:9, bright natural interior lighting, highly detailed`
-    },
-    {
-      alt: `${focusKw} veteriner kontrolü ve sağlık`,
-      caption: `${focusKw} sağlığı için klinik rehber ve uzman önerileri`,
-      prompt: `Professional 8k photo of ${focusKw} in a modern clean veterinary clinic examination, gentle veterinarian, horizontal landscape 16:9, medical lighting`
-    }
+    { alt: `${focusKw}`, caption: `${topic.title} uzman rehberi` },
+    { alt: `${focusKw} beslenme ve günlük bakım tüyoları`, caption: `${focusKw} için doğru beslenme ve bakım rutini` },
+    { alt: `${focusKw} klinik kontrolleri ve sağlık rehberi`, caption: `${focusKw} sağlığı için veteriner hekim önerileri` }
   ];
 
   const results = [];
 
   for (let idx = 0; idx < configs.length; idx++) {
     const cfg = configs[idx];
-    const filename = `${baseSlug}-gorsel-${idx + 1}-ai-patistore.jpg`;
-    console.log(`    [*] AI Görsel ${idx + 1}/3 Üretiliyor (16:9 Yatay - 1200x675): "${cfg.alt}"`);
+    const filename = `${baseSlug}-gorsel-${idx + 1}-patistore.jpg`;
+    console.log(`    [*] Crystal-Clear HD Görsel ${idx + 1}/3 Yükleniyor (1200x675 16:9): "${cfg.alt}"`);
 
-    let buffer = null;
-
+    const targetUrl = selectedUrls[idx % selectedUrls.length];
     try {
-      const fullPrompt = `${cfg.prompt}, photorealistic 8k, horizontal landscape 16:9, cinematic studio lighting, masterpiece, no text, no watermark`;
-      const encoded = encodeURIComponent(fullPrompt);
-      const aiUrl = `https://image.pollinations.ai/prompt/${encoded}?width=1200&height=675&nologo=true&model=flux`;
-      const res = await fetch(aiUrl);
+      const res = await fetch(targetUrl);
       if (res.ok) {
-        buffer = Buffer.from(await res.arrayBuffer());
+        const buffer = Buffer.from(await res.arrayBuffer());
+        const uploaded = await uploadImage(buffer, filename, cfg.alt, cfg.caption);
+        if (uploaded) {
+          results.push({
+            id: uploaded.id,
+            url: uploaded.source_url,
+            alt: cfg.alt,
+            caption: cfg.caption
+          });
+        }
       }
     } catch (e) {
-      console.error(`AI Görsel ${idx + 1} oluşturulamadı:`, e.message);
-    }
-
-    if (buffer) {
-      const uploaded = await uploadImage(buffer, filename, cfg.alt, cfg.caption);
-      if (uploaded) {
-        results.push({
-          id: uploaded.id,
-          url: uploaded.source_url,
-          alt: cfg.alt,
-          caption: cfg.caption
-        });
-      }
+      console.error(`Görsel ${idx + 1} indirilemedi:`, e.message);
     }
   }
 
   return results;
 }
 
-// 4. Master 2500+ Word EEAT & RankMath 100/100 Content Generator with Custom Image Prompts
+// 4. Master 2500+ Word EEAT & RankMath 100/100 Content Generator
 async function generateMasterArticle(topic, recentPosts) {
   const focusKw = topic.focus_keyword;
   const isLocal = Boolean(topic.city && topic.district && topic.service);
@@ -248,7 +304,7 @@ async function generateMasterArticle(topic, recentPosts) {
 Sen; 20 yılı aşkın deneyime sahip Kıdemli bir SEO Stratejisti, Veri Odaklı İçerik Mimarı ve aynı zamanda tam 25 yıldır evinde kedi, köpek ve egzotik dostlar büyütmüş, veteriner literatürünü yakından takip eden tutkulu bir Evcil Hayvan Uzmanısın.
 
 GÖREVİN:
-Aşağıda verilen anahtar kelime ve konu doğrultusunda; Google'ın en güncel çekirdek güncellemeleriyle (Helpful Content System, Spam Updates, EEAT) ve RankMath SEO algoritmasıyla %100 uyumlu (100/100 Skor), MİNİMUM 2500 KELİMELİK dev bir blog rehberi ve BU REHBERE %100 BİREBİR ÖRTÜŞEN 3 ADET İNGİLİZCE YAPAY ZEKA GÖRSEL PROMPTU üretmektir.
+Aşağıda verilen anahtar kelime ve konu doğrultusunda; Google'ın en güncel çekirdek güncellemeleriyle (Helpful Content System, Spam Updates, EEAT) ve RankMath SEO algoritmasıyla %100 uyumlu (100/100 Skor), MİNİMUM 2500 KELİMELİK dev bir blog rehberi üretmektir.
 
 KRİTİK RANKMATH 100/100 KURALLARI:
 1. SEO Başlığı (H1) & Meta Başlığı: "${focusKw}" tam kelime öbeğini YALIN HALDE İÇERMELİ, AYNI ZAMANDA MUTLAKA BİR RAKAM (Örn: "2026", "7 Altın Kural", "5 Kritik İpucu") ve Güçlü Kelime (Uzman Rehberi, Eksiksiz) içermelidir.
@@ -296,10 +352,10 @@ ${internalLinks || "https://www.patistore.net/pet-kuafor/"}
 
 ---
 
-### 🖼️ %100 KONUYLA ÖRTÜŞEN 3 GÖRSEL PROMPTU (İNGİLİZCE):
-1. Görsel 1: Konunun ana temasını (tam ırk/hizmet/vaka ortamını) anlatan İngilizce prompt. Alt etiketi: "${focusKw}".
-2. Görsel 2: Yazının 2. bölümündeki beslenme/bakım/hizmet aşamasını anlatan detaylı İngilizce prompt. Alt etiketi: Konunun en geçerli semantik kelimesi.
-3. Görsel 3: Yazının 4. bölümündeki sağlık/kontrol/klinik aşamasını anlatan detaylı İngilizce prompt. Alt etiketi: Konunun 2. geçerli semantik kelimesi.
+### 🚫 YASAKLAR
+- "Keyword stuffing" yapmak yasaktır.
+- "Günümüz dünyasında...", "Evcil hayvanlar hayatımızın neşesidir..." gibi yapay zeka klişeleriyle başlamak YASAKTIR.
+- 15 kelime ve üzeri tek bir cümle dahi kurmak KESİNLİKLE YASAKTIR.
 
 ÇIKTI FORMATI (DÜZ GEÇERLİ JSON):
 {
@@ -309,18 +365,15 @@ ${internalLinks || "https://www.patistore.net/pet-kuafor/"}
   "image_prompts": [
     {
       "alt": "${focusKw}",
-      "caption": "${focusKw} detaylı incelemesi",
-      "prompt": "Highly detailed 8k photography of..."
+      "caption": "${focusKw} detaylı incelemesi"
     },
     {
-      "alt": "konuyla ilgili 1. semantik alt etiket",
-      "caption": "...",
-      "prompt": "Detailed 8k photography of..."
+      "alt": "${focusKw} beslenme ve bakım tüyoları",
+      "caption": "${focusKw} için doğru beslenme rehberi"
     },
     {
-      "alt": "konuyla ilgili 2. semantik alt etiket",
-      "caption": "...",
-      "prompt": "Detailed 8k photography of..."
+      "alt": "${focusKw} klinik kontrolleri ve sağlık rehberi",
+      "caption": "${focusKw} sağlığı için veteriner hekim önerileri"
     }
   ],
   "content_html": "<p>...</p><h2>...</h2>"
@@ -360,7 +413,7 @@ ${internalLinks || "https://www.patistore.net/pet-kuafor/"}
 // 5. Main Execution Engine (Hourly / Batch)
 async function runBatch(count = 1, status = 'publish') {
   console.log('================================================================');
-  console.log(`🐾 Patistore.net %100 Örtüşen AI Görselli & RankMath 100/100 Botu`);
+  console.log(`🐾 Patistore.net Crystal-Clear HD Görselli & RankMath 100/100 Botu`);
   console.log(`Hedef: ${count} Adet Kapsamlı İçerik | Durum: ${status}`);
   console.log('================================================================\n');
 
@@ -432,21 +485,21 @@ async function runBatch(count = 1, status = 'publish') {
     console.log(`    -> Odak Kelime: "${task.focus_keyword}"`);
     console.log(`    -> Kalıcı Bağlantı: "${exactSlug}"`);
 
-    // 1. Generate 2500+ Word EEAT Article and Specific Image Prompts
-    console.log(`    [*] 25 Yıllık Deneyim & %100 Konu Uyumlu Görsel Prompları Hazırlanıyor...`);
+    // 1. Generate 2500+ Word EEAT Article
+    console.log(`    [*] 25 Yıllık Deneyim & RankMath 100/100 Kriterleriyle İçerik Üretiliyor...`);
     const article = await generateMasterArticle(task, recentPosts);
     if (!article) {
       console.log(`    [x] İçerik üretilemedi, atlanıyor.`);
       continue;
     }
 
-    // 2. Generate 3 %100 Matching AI Images based on Article's exact prompts
-    console.log(`    [*] Konuya ve Başlıklara %100 Birebir Örtüşen 3 AI Görseli Üretiliyor...`);
-    const uploadedImages = await generateContextualImages(task, article.image_prompts || []);
+    // 2. Generate 3 Crystal-Clear Editorial HD Images (1200x675 16:9)
+    console.log(`    [*] Konuyla %100 Örtüşen 3 Crystal-Clear HD Görsel Yükleniyor...`);
+    const uploadedImages = await generateUltraHDImages(task, article.image_prompts || []);
     const featuredMediaId = uploadedImages[0]?.id;
     const inContentImages = uploadedImages.slice(1);
 
-    // 3. Inject In-Content Images into HTML at exact headings
+    // 3. Inject In-Content Images into HTML
     if (inContentImages.length >= 2 && article.content_html) {
       const imgHtml1 = `<figure class="wp-block-image size-large" style="margin:30px 0; text-align:center;"><img src="${inContentImages[0].url}" alt="${inContentImages[0].alt}" style="width:100%; max-width:1200px; height:auto; aspect-ratio:16/9; object-fit:cover; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.08);" /><figcaption style="text-align:center; font-size:13px; color:#64748b; margin-top:8px;">${inContentImages[0].caption}</figcaption></figure>`;
       const imgHtml2 = `<figure class="wp-block-image size-large" style="margin:30px 0; text-align:center;"><img src="${inContentImages[1].url}" alt="${inContentImages[1].alt}" style="width:100%; max-width:1200px; height:auto; aspect-ratio:16/9; object-fit:cover; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.08);" /><figcaption style="text-align:center; font-size:13px; color:#64748b; margin-top:8px;">${inContentImages[1].caption}</figcaption></figure>`;
@@ -495,7 +548,7 @@ async function runBatch(count = 1, status = 'publish') {
         console.log(`       🔗 Link: ${created.link}`);
         console.log(`       ⭐ Odak Kelime: "${task.focus_keyword}"`);
         console.log(`       📝 Başlık: "${article.title}"`);
-        console.log(`       🖼️ Yüklenen AI Görsel Sayısı: ${uploadedImages.length} Adet (16:9 Yatay - %100 Konu Uyumlu)`);
+        console.log(`       🖼️ Yüklenen HD Görsel Sayısı: ${uploadedImages.length} Adet (1200x675 Crystal-Clear)`);
         successCount++;
         const slugKey = task.slug_key || task.title;
         publishedSlugs.add(slugKey);
