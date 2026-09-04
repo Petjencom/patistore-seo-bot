@@ -37,9 +37,10 @@
     "toy-poodle-bakimi",
     "yavru-kopek-tuvalet-egitimi",
     "besiktas-pet-taksi",
-    "van-kedisi-bakimi"
+    "van-kedisi-bakimi",
+    "kedilerde-tuy-dokulmesi-onleme"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "breed"
+  "last_mode": "cost_care"
 }
