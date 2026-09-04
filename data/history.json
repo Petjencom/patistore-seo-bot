@@ -19,9 +19,10 @@
     "british-shorthair-bakimi",
     "kedi-asi-takvimi-ve-fiyatlari",
     "kadikoy-pet-otel",
-    "golden-retriever-bakimi"
+    "golden-retriever-bakimi",
+    "kopek-asi-takvimi"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "breed"
+  "last_mode": "cost_care"
 }
