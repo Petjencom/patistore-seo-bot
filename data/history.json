@@ -28,9 +28,10 @@
     "pomeranian-boo-bakimi",
     "evde-kopek-besleme-maliyeti",
     "kadikoy-pet-kuafor",
-    "maltese-terrier-bakimi"
+    "maltese-terrier-bakimi",
+    "kedi-kisirlastirma-ucretleri"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "breed"
+  "last_mode": "cost_care"
 }
