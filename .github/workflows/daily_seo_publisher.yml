@@ -1,0 +1,41 @@
+﻿name: Patistore Gunluk SEO Icerik Otomasyonu
+
+on:
+  schedule:
+    # Her gun Turkiye saatiyle sabah 09:00'da calisir (UTC 06:00)
+    - cron: '0 6 * * *'
+  # Istediginizde GitHub panelinden tek tusla manuel tetikleme butonu
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish_articles:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repoyu Klonla
+        uses: actions/checkout@v4
+
+      - name: Node.js Ortamini Kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Gunluk 5 Icerigi Uret ve WordPress'e Yayina Al
+        env:
+          WP_URL: ${{ secrets.WP_URL }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          node main.js --count=5 --status=publish
+
+      - name: Yayin Gecmisini Guncelle ve Kaydet
+        run: |
+          git config --global user.name "Patistore SEO Bot"
+          git config --global user.email "bot@patistore.net"
+          git add data/history.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore: otomatik gunluk yayin gecmisi guncellendi [skip ci]"
+          git push
