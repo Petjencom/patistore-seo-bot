@@ -41,9 +41,10 @@
     "kedilerde-tuy-dokulmesi-onleme",
     "besiktas-pet-shop",
     "fransiz-bulldog-bakimi",
-    "kisirlastirilmis-kedi-mamasi-secimi"
+    "kisirlastirilmis-kedi-mamasi-secimi",
+    "besiktas-pet-kuafor"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "cost_care"
+  "last_mode": "local"
 }
