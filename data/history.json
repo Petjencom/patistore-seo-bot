@@ -27,9 +27,10 @@
     "kadikoy-pet-shop",
     "pomeranian-boo-bakimi",
     "evde-kopek-besleme-maliyeti",
-    "kadikoy-pet-kuafor"
+    "kadikoy-pet-kuafor",
+    "maltese-terrier-bakimi"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "local"
+  "last_mode": "breed"
 }
