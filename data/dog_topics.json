@@ -1,0 +1,65 @@
+{
+  "categories": ["Köpek Irkları", "Köpek Beslenmesi", "Köpek Eğitimi", "Köpek Sağlığı"],
+  "topics": [
+    {
+      "title": "Golden Retriever Karakteri, Egzersiz İhtiyacı ve Bakım Rehberi",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Golden Retriever bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Pomeranian Boo Tüy Bakımı, Beslenmesi ve Karakter Analizi",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Pomeranian Boo bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Yavru Köpeklerde Tuvalet Eğitimi: Adım Adım Başarı Rehberi",
+      "category": "Köpek Eğitimi",
+      "focus_keyword": "yavru köpek tuvalet eğitimi",
+      "type": "training"
+    },
+    {
+      "title": "Köpeklerde BARF (Çiğ Beslenme) Diyeti Nedir? Faydaları ve Riskleri",
+      "category": "Köpek Beslenmesi",
+      "focus_keyword": "köpeklerde BARF diyeti",
+      "type": "nutrition"
+    },
+    {
+      "title": "Kangal Çoban Köpeği Özellikleri, Beslenmesi ve Koruma İçgüdüsü",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Kangal köpeği özellikleri",
+      "type": "breed"
+    },
+    {
+      "title": "Köpeklerde Kuru Mama Porsiyon Hesaplama ve Kilo Kontrolü",
+      "category": "Köpek Beslenmesi",
+      "focus_keyword": "köpek mama porsiyon hesaplama",
+      "type": "nutrition"
+    },
+    {
+      "title": "Fransız Bulldog (French Bulldog) Sağlık Sorunları ve Bakım İpuçları",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Fransız Bulldog bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Köpeklerde Ayrılık Anksiyetesi ve Yalnız Kalma Alıştırma Rehberi",
+      "category": "Köpek Eğitimi",
+      "focus_keyword": "köpeklerde ayrılık anksiyetesi",
+      "type": "training"
+    },
+    {
+      "title": "Köpeklerde Aşı Takvimi ve İç-Dış Parazit Uygulamaları",
+      "category": "Köpek Sağlığı",
+      "focus_keyword": "köpek aşı takvimi",
+      "type": "health"
+    },
+    {
+      "title": "Alman Kurdu (German Shepherd) Eğitimi, Beslenmesi ve Karakteri",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Alman Kurdu eğitimi",
+      "type": "breed"
+    }
+  ]
+}
