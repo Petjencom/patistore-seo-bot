@@ -22,9 +22,10 @@
     "golden-retriever-bakimi",
     "kopek-asi-takvimi",
     "kadikoy-pet-taksi",
-    "scottish-fold-ozellikleri"
+    "scottish-fold-ozellikleri",
+    "evde-kedi-bakimi-masrafi"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "breed"
+  "last_mode": "cost_care"
 }
