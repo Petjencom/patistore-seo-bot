@@ -38,9 +38,10 @@
     "yavru-kopek-tuvalet-egitimi",
     "besiktas-pet-taksi",
     "van-kedisi-bakimi",
-    "kedilerde-tuy-dokulmesi-onleme"
+    "kedilerde-tuy-dokulmesi-onleme",
+    "besiktas-pet-shop"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "cost_care"
+  "last_mode": "local"
 }
