@@ -1,0 +1,84 @@
+{
+  "cities": [
+    {
+      "name": "İstanbul",
+      "districts": ["Kadıköy", "Beşiktaş", "Şişli", "Üsküdar", "Bakırköy", "Beylikdüzü", "Pendik", "Maltepe", "Ataşehir", "Sarıyer", "Fatih", "Ümraniye", "Kartal", "Tuzla", "Zeytinburnu"]
+    },
+    {
+      "name": "Ankara",
+      "districts": ["Çankaya", "Keçiören", "Yenimahalle", "Mamak", "Etimesgut", "Sincan", "Gölbaşı", "Altındağ", "Pursaklar"]
+    },
+    {
+      "name": "İzmir",
+      "districts": ["Karşıyaka", "Konak", "Bornova", "Buca", "Bayraklı", "Çiğli", "Gaziemir", "Balçova", "Urla", "Çeşme"]
+    },
+    {
+      "name": "Bursa",
+      "districts": ["Nilüfer", "Osmangazi", "Yıldırım", "Mudanya", "İnegöl", "Gemlik"]
+    },
+    {
+      "name": "Antalya",
+      "districts": ["Muratpaşa", "Konyaaltı", "Kepez", "Alanya", "Manavgat", "Kemer"]
+    },
+    {
+      "name": "Adana",
+      "districts": ["Seyhan", "Çukurova", "Yüreğir", "Sarıçam"]
+    },
+    {
+      "name": "Kocaeli",
+      "districts": ["İzmit", "Gebze", "Gölcük", "Körfez", "Başiskele", "Kartepe"]
+    },
+    {
+      "name": "Muğla",
+      "districts": ["Bodrum", "Fethiye", "Marmaris", "Menteşe", "Milas"]
+    },
+    {
+      "name": "Eskişehir",
+      "districts": ["Tepebaşı", "Odunpazarı"]
+    },
+    {
+      "name": "Gaziantep",
+      "districts": ["Şahinbey", "Şehitkamil"]
+    },
+    {
+      "name": "Mersin",
+      "districts": ["Yenişehir", "Mezitli", "Akdeniz", "Toroslar", "Tarsus"]
+    },
+    {
+      "name": "Samsun",
+      "districts": ["Atakum", "İlkadım", "Canik"]
+    },
+    {
+      "name": "Aydın",
+      "districts": ["Efeler", "Kuşadası", "Didim", "Nazilli"]
+    },
+    {
+      "name": "Tekirdağ",
+      "districts": ["Süleymanpaşa", "Çorlu", "Çerkezköy"]
+    },
+    {
+      "name": "Balıkesir",
+      "districts": ["Karesi", "Altıeylül", "Edremit", "Bandırma", "Ayvalık"]
+    },
+    {
+      "name": "Konya",
+      "districts": ["Selçuklu", "Meram", "Karatay"]
+    },
+    {
+      "name": "Kayseri",
+      "districts": ["Melikgazi", "Kocasinan", "Talas"]
+    },
+    {
+      "name": "Trabzon",
+      "districts": ["Ortahisar", "Akçaabat"]
+    },
+    {
+      "name": "Sakarya",
+      "districts": ["Adapazarı", "Serdivan", "Erenler"]
+    },
+    {
+      "name": "Denizli",
+      "districts": ["Pamukkale", "Merkezefendi"]
+    }
+  ]
+}
