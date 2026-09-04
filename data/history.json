@@ -14,8 +14,10 @@
     "kadıköy-pet-taksi",
     "British Shorthair Bakım, Karakter ve Beslenme Rehberi",
     "kadıköy-pet-shop",
-    "Kangal Çoban Köpeği Özellikleri, Beslenmesi ve Koruma İçgüdüsü"
+    "Kangal Çoban Köpeği Özellikleri, Beslenmesi ve Koruma İçgüdüsü",
+    "kadikoy-veteriner-klinigi"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
-  "last_type": "evergreen"
+  "last_type": "evergreen",
+  "last_mode": "local"
 }
