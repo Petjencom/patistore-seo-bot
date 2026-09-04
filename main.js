@@ -386,29 +386,12 @@ async function generateUltraHDImages(topic, imagePrompts = []) {
 function generateDiverseTitle(rawTitle, focusKw, mode) {
   let title = (rawTitle || '').trim();
 
-  // Banned repetitive phrases
-  const bannedPhrases = [
-    /7\s*altın\s*kural/gi,
-    /altın\s*kurallar?/gi,
-    /7\s*kural/gi,
-    /7\s*altin\s*kural/gi,
-    /bilmeniz\s*gereken\s*7/gi,
-    /7\s*onemli\s*ipucu/gi,
-    /7\s*ipucu/gi,
-    /7\s*madde/gi
-  ];
-
-  let hasBanned = false;
-  for (const b of bannedPhrases) {
-    if (b.test(title)) {
-      hasBanned = true;
-      title = title.replace(b, '').trim();
-    }
-  }
+  // Banned repetitive phrases check
+  const isBanned = /7\s*alt[ıi]n\s*kural|alt[ıi]n\s*kurallar?|7\s*kural|bilmeniz\s*gereken\s*7|7\s*ipucu|7\s*madde/i.test(title);
 
   const cleanKw = focusKw.charAt(0).toUpperCase() + focusKw.slice(1);
 
-  if (hasBanned || title.length < 15 || !title.toLowerCase().includes(focusKw.toLowerCase())) {
+  if (isBanned || title.length < 15 || !title.toLowerCase().includes(focusKw.toLowerCase())) {
     const localTemplates = [
       `${cleanKw}: 2026 Güncel Fiyatları, Hizmet Detayları ve Doğru Seçim Rehberi`,
       `${cleanKw}: En Güvenilir Tavsiyeler, Kullanıcı Yorumları ve İpuçları (2026)`,
@@ -443,11 +426,11 @@ function generateDiverseTitle(rawTitle, focusKw, mode) {
 
   // Ensure title starts with focus keyword cleanly
   if (!title.toLowerCase().startsWith(focusKw.toLowerCase())) {
-    title = `${cleanKw}: ${title.replace(/^[^:]+:s*/, '')}`;
+    title = `${cleanKw}: ${title.replace(/^[^:]+:\s*/, '')}`;
   }
 
-  // Remove trailing or double colons
-  title = title.replace(/:s*:/g, ':').replace(/s+/g, ' ').trim();
+  // Clean double colons and normalize spaces
+  title = title.replace(/:\s*:/g, ':').replace(/\s+/g, ' ').trim();
   return title;
 }
 
