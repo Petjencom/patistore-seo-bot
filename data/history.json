@@ -44,9 +44,10 @@
     "kisirlastirilmis-kedi-mamasi-secimi",
     "besiktas-pet-kuafor",
     "maine-coon-ozellikleri",
-    "veteriner-muayene-ucretleri-2026"
+    "veteriner-muayene-ucretleri-2026",
+    "sisli-veteriner-klinigi"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "cost_care"
+  "last_mode": "local"
 }
