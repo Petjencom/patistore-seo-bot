@@ -270,7 +270,7 @@ function generateDiverseTitle(rawTitle, focusKw, mode) {
   return title;
 }
 
-// Generate Genuine 2500+ Word EEAT Article via Gemini (Robust & Fail-Proof Engine)
+// Generate Genuine 2500+ Word EEAT Article via Gemini (Direct HTML Generation - Zero JSON Truncation)
 async function generateMasterArticle(topic, recentPosts = []) {
   const focusKw = topic.focus_keyword;
   const isLocal = topic.type === 'local';
@@ -283,7 +283,7 @@ async function generateMasterArticle(topic, recentPosts = []) {
 Sen; 20 yılı aşkın deneyime sahip Kıdemli bir SEO Stratejisti, Veri Odaklı İçerik Mimarı ve aynı zamanda tam 25 yıldır evinde kedi, köpek ve egzotik dostlar büyütmüş, veteriner literatürünü yakından takip eden tutkulu bir Evcil Hayvan Uzmanısın.
 
 GÖREVİN:
-Kullanıcının vereceği anahtar kelimeler doğrultusunda Google EEAT ve Helpful Content standartlarına %100 uyumlu, derinlemesine saha tecrübesi içeren, internetteki yüzeysel bilgilerin ötesine geçen, MİNİMUM 2500 KELİMELİK DEVASA VE EKSİKSİZ bir Türkçe rehber üretmektir.
+Kullanıcının vereceği anahtar kelimeler doğrultusunda Google EEAT ve Helpful Content standartlarına %100 uyumlu, derinlemesine saha tecrübesi içeren, internetteki yüzeysel bilgilerin ötesine geçen, MİNİMUM 2500 KELİMELİK DEVASA VE EKSİKSİZ bir Türkçe rehber yazmaktır.
 
 HEDEF KONU: "${topic.title}"
 ODAK ANAHTAR KELİME: "${focusKw}"
@@ -296,23 +296,12 @@ KATI YAZIM VE DİL KURALLARI:
 5. Bilimsel Referans: WSAVA, AVMA, TVHB, Dr. Karen Becker gibi otoritelere atıf yap.
 6. Gerçek Vakalar: Yaşanmış klinik vaka öyküleri, hasta hikayeleri ve pratik tüyolar aktar.
 7. Zengin Unsurlar: Karşılaştırmalı HTML <table> tabloları, maddeli ve numaralı listeler (<ul>, <ol>).
-8. SSS (FAQ): 7 Soruluk detaylı Soru-Cevap bölümü ve Schema.org uyumlu FAQPage JSON-LD şeması.
+8. SSS (FAQ): 7 Soruluk detaylı Soru-Cevap bölümü ve Schema.org uyumlu FAQPage JSON-LD bloğu ekle.
 9. 20 Kalın Terimli Özet: En sonda 20 farklı semantik terimin <strong>kalın</strong> yazıldığı 200 kelimelik özet.
 10. BAŞLIK KURALI: "7 Altın Kural", "7 Kural", "7 İpucu" gibi kalıplar KULLANILMAYACAK.
 ${internalLinksPrompt}
 
-ÇIKTI FORMATI:
-Sadece ve sadece aşağıdaki JSON formatında geçerli bir JSON objesi döndür:
-{
-  "title": "Konuya özel özgün ve profesyonel H1 Başlığı",
-  "meta_title": "60 karakteri geçmeyen odak kelimeyle başlayan Meta Title | Patistore",
-  "meta_description": "${focusKw} hakkında 2026 yılına özel 25 yıllık uzman rehberi. Tüm detayları, bakım ve sağlık tüyolarını hemen keşfedin.",
-  "image_prompts": [
-    { "alt": "${focusKw}", "caption": "${focusKw} detaylı incelemesi" },
-    { "alt": "${focusKw} detaylı rehber görseli", "caption": "${focusKw} için uzman önerileri" }
-  ],
-  "content_html": "<p>İlk cümlede <strong>${focusKw}</strong> geçen detaylı giriş...</p><h2>...</h2>"
-}
+ÇIKTI: Sadece ve sadece makalenin zengin HTML kodunu (<p>, <h2>, <h3>, <table>, <ul>, <script>) döndür. Markdown backtick (```html) koyma.
 `;
 
   try {
@@ -324,51 +313,31 @@ Sadece ve sadece aşağıdaki JSON formatında geçerli bir JSON objesi döndür
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 8192,
-          responseMimeType: "application/json"
+          maxOutputTokens: 8192
         }
       })
     });
 
     if (res.ok) {
       const d = await res.json();
-      const text = d.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (text) {
-        const parsed = JSON.parse(text);
-        if (parsed.content_html && parsed.content_html.length > 500) {
-          return parsed;
-        }
+      let html = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      html = html.replace(/```html|```/g, '').trim();
+
+      if (html.length > 500) {
+        const cleanKw = focusKw.charAt(0).toUpperCase() + focusKw.slice(1);
+        const dynamicTitle = `${cleanKw}: 2026 Kapsamlı Bakım, Sağlık ve Karakter Rehberi`;
+        const metaDesc = `${focusKw} hakkında 2026 yılına özel 25 yıllık uzman rehberi. Beslenme, bakım, maliyet ve sağlık tüyolarını hemen keşfedin.`;
+
+        return {
+          title: dynamicTitle,
+          meta_title: `${dynamicTitle.substring(0, 50)} | Patistore`,
+          meta_description: metaDesc,
+          content_html: html
+        };
       }
     }
   } catch(e) {
-    console.error('[-] Gemini 1.5-flash Hatası:', e.message);
-  }
-
-  // Backup fallback using gemini-1.5-pro if needed
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 8192,
-          responseMimeType: "application/json"
-        }
-      })
-    });
-
-    if (res.ok) {
-      const d = await res.json();
-      const text = d.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (text) {
-        return JSON.parse(text);
-      }
-    }
-  } catch(e) {
-    console.error('[-] Gemini Backup Hatası:', e.message);
+    console.error('[-] Gemini 3.6-flash Hatası:', e.message);
   }
 
   return null;
