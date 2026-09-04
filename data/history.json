@@ -29,9 +29,10 @@
     "evde-kopek-besleme-maliyeti",
     "kadikoy-pet-kuafor",
     "maltese-terrier-bakimi",
-    "kedi-kisirlastirma-ucretleri"
+    "kedi-kisirlastirma-ucretleri",
+    "besiktas-veteriner-klinigi"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "cost_care"
+  "last_mode": "local"
 }
