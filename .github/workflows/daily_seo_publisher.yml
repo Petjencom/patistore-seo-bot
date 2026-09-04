@@ -1,9 +1,9 @@
-﻿name: Patistore Saatlik SEO Icerik Otomasyonu
+name: Patistore 20 Dakikalik SEO Icerik Otomasyonu
 
 on:
   schedule:
-    # Her saat basi (Gunde 24 saat, saatte 1 icerik) otomatik calisir
-    - cron: '0 * * * *'
+    # Her 20 dakikada bir (Gunde 72 icerik: 1 Yerel Hizmet -> 1 Populer Irk -> 1 Trend/Maliyet/Bakim)
+    - cron: '*/20 * * * *'
   # Manuel tek tusla tetikleme imkani
   workflow_dispatch:
 
@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 jobs:
-  publish_hourly_article:
+  publish_article_every_20m:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,19 +23,19 @@ jobs:
         with:
           node-version: 20
 
-      - name: Saatte 1 Adet 2500+ Kelime RankMath 100/100 Icerigi Yayina Al
+      - name: 20 Dakikalik 2500+ Kelime RankMath 100/100 Icerigi Yayina Al
         env:
           WP_URL: ${{ secrets.WP_URL }}
           WP_USER: ${{ secrets.WP_USER }}
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          node main.js --count=1 --status=publish
+          node main.js --status=publish
 
       - name: Yayin Gecmisini Guncelle ve Kaydet
         run: |
           git config --global user.name "Patistore SEO Bot"
           git config --global user.email "bot@patistore.net"
           git add data/history.json
-          git diff --quiet && git diff --staged --quiet || git commit -m "chore: saatlik yayin gecmisi guncellendi [skip ci]"
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore: 20 dakikalik yayin gecmisi guncellendi [skip ci]"
           git push
