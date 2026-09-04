@@ -45,9 +45,10 @@
     "besiktas-pet-kuafor",
     "maine-coon-ozellikleri",
     "veteriner-muayene-ucretleri-2026",
-    "sisli-veteriner-klinigi"
+    "sisli-veteriner-klinigi",
+    "cane-corso-bakimi"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "local"
+  "last_mode": "breed"
 }
