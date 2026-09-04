@@ -1,0 +1,65 @@
+{
+  "categories": ["Kedi Irkları", "Kedi Beslenmesi", "Kedi Sağlığı", "Kedi Bakımı"],
+  "topics": [
+    {
+      "title": "British Shorthair Bakım, Karakter ve Beslenme Rehberi",
+      "category": "Kedi Irkları",
+      "focus_keyword": "British Shorthair bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Scottish Fold Özellikleri, Genetik Sağlığı ve Bakım İpuçları",
+      "category": "Kedi Irkları",
+      "focus_keyword": "Scottish Fold özellikleri",
+      "type": "breed"
+    },
+    {
+      "title": "Kısırlaştırılmış Kedi Maması Seçerken Dikkat Edilmesi Gereken 7 Kural",
+      "category": "Kedi Beslenmesi",
+      "focus_keyword": "kısırlaştırılmış kedi maması seçimi",
+      "type": "nutrition"
+    },
+    {
+      "title": "Yavru Kedilerde Yaş ve Kuru Mama Dengesi Nasıl Olmalı?",
+      "category": "Kedi Beslenmesi",
+      "focus_keyword": "yavru kedi mama dengesi",
+      "type": "nutrition"
+    },
+    {
+      "title": "Van Kedisi Karakteri, Göz Yapısı ve Günlük Bakım Rehberi",
+      "category": "Kedi Irkları",
+      "focus_keyword": "Van Kedisi bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Kedilerde Su İçme Alışkanlığı Kazandırma ve Su Pınarı Kullanımı",
+      "category": "Kedi Sağlığı",
+      "focus_keyword": "kedilerde su içme alışkanlığı",
+      "type": "health"
+    },
+    {
+      "title": "Maine Coon Irkı Özellikleri: Dev Kedilerin Beslenmesi ve Bakımı",
+      "category": "Kedi Irkları",
+      "focus_keyword": "Maine Coon özellikleri",
+      "type": "breed"
+    },
+    {
+      "title": "Kedilerde Tüy Dökülmesini Önlemenin Doğal ve Medikal Yolları",
+      "category": "Kedi Bakımı",
+      "focus_keyword": "kedilerde tüy dökülmesi önleme",
+      "type": "care"
+    },
+    {
+      "title": "Kedilerde Tahılsız Mama Gerekli mi? Artıları ve Eksileri",
+      "category": "Kedi Beslenmesi",
+      "focus_keyword": "kedilerde tahılsız mama",
+      "type": "nutrition"
+    },
+    {
+      "title": "Kedilerde Kum Eğitimi ve Koku Önleme Taktikleri",
+      "category": "Kedi Bakımı",
+      "focus_keyword": "kedi kum eğitimi",
+      "type": "care"
+    }
+  ]
+}
