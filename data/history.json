@@ -49,9 +49,10 @@
     "cane-corso-bakimi",
     "kopeklerde-ayrilik-anksiyetesi",
     "sisli-pet-otel",
-    "ragdoll-kedisi-bakimi"
+    "ragdoll-kedisi-bakimi",
+    "kedilerde-su-icme-aliskanligi"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "breed"
+  "last_mode": "cost_care"
 }
