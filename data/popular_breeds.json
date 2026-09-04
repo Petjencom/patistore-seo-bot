@@ -1,0 +1,124 @@
+{
+  "topics": [
+    {
+      "title": "British Shorthair Bakımı, Karakteri ve Beslenme Rehberi",
+      "category": "Kedi Irkları",
+      "focus_keyword": "British Shorthair bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Golden Retriever Özellikleri, Egzersizi ve Bakım Rehberi",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Golden Retriever bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Scottish Fold Genetik Sağlığı, Karakteri ve Bakım İpuçları",
+      "category": "Kedi Irkları",
+      "focus_keyword": "Scottish Fold özellikleri",
+      "type": "breed"
+    },
+    {
+      "title": "Pomeranian Boo Tüy Bakımı, Eğitimi ve Beslenme Tüyoları",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Pomeranian Boo bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Maltese Terrier Karakteri, Günlük Bakımı ve Tüy Sağlığı",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Maltese Terrier bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Siyam Kedisi Karakteri, İletişim Becerisi ve Bakım Rehberi",
+      "category": "Kedi Irkları",
+      "focus_keyword": "Siyam Kedisi bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Toy Poodle (Kaniş) Tüy Dökülmeme Özelliği ve Bakım İpuçları",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Toy Poodle bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Van Kedisi Göz Yapısı, Yüzme Alışkanlığı ve Bakım Rehberi",
+      "category": "Kedi Irkları",
+      "focus_keyword": "Van Kedisi bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Fransız Bulldog (French Bulldog) Sağlığı, Solunum ve Bakımı",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Fransız Bulldog bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Maine Coon Irkı: Dev Kedilerin Beslenmesi, Sağlığı ve Bakımı",
+      "category": "Kedi Irkları",
+      "focus_keyword": "Maine Coon özellikleri",
+      "type": "breed"
+    },
+    {
+      "title": "Cane Corso Karakteri, İtaat Eğitimi ve Güçlü Beslenme Düzeni",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Cane Corso bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Ragdoll Kedisi Özellikleri, Uysal Karakteri ve Tüy Bakımı",
+      "category": "Kedi Irkları",
+      "focus_keyword": "Ragdoll kedisi bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Rottweiler Eğitimi, Sosyalleştirme ve Doğru Bakım Rehberi",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Rottweiler eğitimi",
+      "type": "breed"
+    },
+    {
+      "title": "Bengal Kedisi Vahşi Desenleri, Enerjisi ve Günlük Bakımı",
+      "category": "Kedi Irkları",
+      "focus_keyword": "Bengal kedisi bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Labrador Retriever Karakteri, Yüzme Tutkusu ve Bakım Tüyoları",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Labrador Retriever bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "İran Kedisi (Persian) Uzun Tüy Bakımı, Göz Temizliği ve Sağlığı",
+      "category": "Kedi Irkları",
+      "focus_keyword": "İran Kedisi bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Chihuahua (Şivava) Küçük Irk Sağlığı, Beslenmesi ve Bakımı",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Chihuahua bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Sphynx (Tüysüz Kedi) Cilt Bakımı, Beslenmesi ve Sağlık Rehberi",
+      "category": "Kedi Irkları",
+      "focus_keyword": "Sphynx kedi bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Sibirya Kurdu (Husky) Egzersiz İhtiyacı, Sıcak Havada Bakımı",
+      "category": "Köpek Irkları",
+      "focus_keyword": "Sibirya Kurdu bakımı",
+      "type": "breed"
+    },
+    {
+      "title": "Tekir Kedi Karakteri, Bağışıklık Gücü ve Günlük Bakım Rehberi",
+      "category": "Kedi Irkları",
+      "focus_keyword": "Tekir kedi bakımı",
+      "type": "breed"
+    }
+  ]
+}
