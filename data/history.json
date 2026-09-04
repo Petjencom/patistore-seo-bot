@@ -17,9 +17,10 @@
     "Kangal Çoban Köpeği Özellikleri, Beslenmesi ve Koruma İçgüdüsü",
     "kadikoy-veteriner-klinigi",
     "british-shorthair-bakimi",
-    "kedi-asi-takvimi-ve-fiyatlari"
+    "kedi-asi-takvimi-ve-fiyatlari",
+    "kadikoy-pet-otel"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "cost_care"
+  "last_mode": "local"
 }
