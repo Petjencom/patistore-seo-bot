@@ -20,9 +20,10 @@
     "kedi-asi-takvimi-ve-fiyatlari",
     "kadikoy-pet-otel",
     "golden-retriever-bakimi",
-    "kopek-asi-takvimi"
+    "kopek-asi-takvimi",
+    "kadikoy-pet-taksi"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "cost_care"
+  "last_mode": "local"
 }
