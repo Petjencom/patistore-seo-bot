@@ -434,7 +434,7 @@ function generateDiverseTitle(rawTitle, focusKw, mode) {
   return title;
 }
 
-// Generate Genuine 2500+ Word EEAT Article via Gemini (Multi-Section Deep Architecture)
+// Generate Genuine 2500+ Word EEAT Article via Gemini (Robust & Fail-Proof Engine)
 async function generateMasterArticle(topic, recentPosts = []) {
   const focusKw = topic.focus_keyword;
   const isLocal = topic.type === 'local';
@@ -443,42 +443,30 @@ async function generateMasterArticle(topic, recentPosts = []) {
     ? `\nSİTEDEKİ MEVCUT YAZILAR (İÇ LİNKLEME İÇİN):\n${recentPosts.slice(0, 10).map(p => `- Başlık: "${p.title}" | URL: "${p.link}"`).join('\n')}\nKURAL: Metin içinde doğal olarak en az 3-4 farklı yere yukarıdaki linklerden <a href="URL">Uygun Başlık</a> şeklinde dofollow iç link ver.`
     : '';
 
-  const masterSystemPrompt = `
+  const prompt = `
 Sen; 20 yılı aşkın deneyime sahip Kıdemli bir SEO Stratejisti, Veri Odaklı İçerik Mimarı ve aynı zamanda tam 25 yıldır evinde kedi, köpek ve egzotik dostlar büyütmüş, veteriner literatürünü yakından takip eden tutkulu bir Evcil Hayvan Uzmanısın.
 
 GÖREVİN:
-Kullanıcının vereceği anahtar kelimeler doğrultusunda Google EEAT ve Helpful Content standartlarına %100 uyumlu, derinlemesine saha tecrübesi içeren, internetteki yüzeysel bilgilerin ötesine geçen, DEVASA VE DETAYLI bir rehber üretmektir.
+Kullanıcının vereceği anahtar kelimeler doğrultusunda Google EEAT ve Helpful Content standartlarına %100 uyumlu, derinlemesine saha tecrübesi içeren, internetteki yüzeysel bilgilerin ötesine geçen, MİNİMUM 2500 KELİMELİK DEVASA VE EKSİKSİZ bir Türkçe rehber üretmektir.
 
-KATI DİL VE YAZIM KURALLARI:
+HEDEF KONU: "${topic.title}"
+ODAK ANAHTAR KELİME: "${focusKw}"
+
+KATI YAZIM VE DİL KURALLARI:
 1. Cümle Uzunluğu: İstisnasız her cümlenin kelime sayısı 15'ten KESİNLİKLE AZ olmalıdır (Maksimum 14 kelime).
 2. Edilgen Çatı: Pasif cümle oranı %7'yi ASLA geçmemelidir. Canlı, dinamik, etken Türkçe kullan.
 3. Geçiş Cümleleri: İçeriğin en az %65'inde mantıksal geçiş ifadeleri (çünkü, bu nedenle, örneğin, aksine, nitekim vb.) bulunmalıdır.
 4. Paragraf Yapısı: Paragraflar 2 ila 4 kısa cümleden oluşmalı, asla bloklaşmamalıdır.
 5. Bilimsel Referans: WSAVA, AVMA, TVHB, Dr. Karen Becker gibi otoritelere atıf yap.
 6. Gerçek Vakalar: Yaşanmış klinik vaka öyküleri, hasta hikayeleri ve pratik tüyolar aktar.
-`;
+7. Zengin Unsurlar: Karşılaştırmalı HTML <table> tabloları, maddeli ve numaralı listeler (<ul>, <ol>).
+8. SSS (FAQ): 7 Soruluk detaylı Soru-Cevap bölümü ve Schema.org uyumlu FAQPage JSON-LD şeması.
+9. 20 Kalın Terimli Özet: En sonda 20 farklı semantik terimin <strong>kalın</strong> yazıldığı 200 kelimelik özet.
+10. BAŞLIK KURALI: "7 Altın Kural", "7 Kural", "7 İpucu" gibi kalıplar KULLANILMAYACAK.
+${internalLinksPrompt}
 
-  console.log(`    [*] 1/3: Başlıklar, Meta Veriler ve Giriş Planlanıyor...`);
-  
-  // Step 1: Outline & Metadata with Highly Varied & Professional CTR Titles
-  const outlinePrompt = `${masterSystemPrompt}
-HEDEF KONU: "${topic.title}"
-ODAK ANAHTAR KELİME: "${focusKw}"
-
-BAŞLIK KURALLARI (ÇOK KATI):
-- "7 Altın Kural", "7 Kural", "Altın Kural", "7 İpucu", "7 Madde" kelimelerini KULLANMAK KESİNLİKLE YASAKTIR.
-- Başlıklar her makalede tamamen farklı, özgün ve konuya özel olmalıdır.
-- KESİNLİKLE "7 Altın Kural", "7 Kural", "Altın Kurallar" gibi klişe ve tekrar eden başlıklar KULLANMA.
-- Başlık konunun türüne göre son derece profesyonel, merak uyandırıcı, tıklama oranı (CTR) yüksek ve özgün olmalıdır.
-- Başlık mutlaka tam odak anahtar kelime ("${focusKw}") ile başlamalıdır.
-- Örnek Başlık Stilleri (Her makalede konuya en uygun ve farklı olanı seç):
-  * "${focusKw.charAt(0).toUpperCase() + focusKw.slice(1)}: 2026 Kapsamlı Uzman Rehberi ve Dikkat Edilmesi Gerekenler"
-  * "${focusKw.charAt(0).toUpperCase() + focusKw.slice(1)}: Fiyatlar, Güncel Tavsiyeler ve Doğru Tercih İpuçları (2026)"
-  * "${focusKw.charAt(0).toUpperCase() + focusKw.slice(1)}: Sağlık, Karakter ve Bakımında Bilinmesi Gereken Tüm Detaylar"
-  * "${focusKw.charAt(0).toUpperCase() + focusKw.slice(1)}: Veteriner Hekim Onaylı Bakım ve Maliyet Rehberi"
-  * "${focusKw.charAt(0).toUpperCase() + focusKw.slice(1)}: Doğru Seçim Nasıl Yapılır? 2026 Detaylı İnceleme"
-
-Yanıtını SADECE şu JSON formatında ver:
+ÇIKTI FORMATI:
+Sadece ve sadece aşağıdaki JSON formatında geçerli bir JSON objesi döndür:
 {
   "title": "Konuya özel özgün ve profesyonel H1 Başlığı",
   "meta_title": "60 karakteri geçmeyen odak kelimeyle başlayan Meta Title | Patistore",
@@ -487,125 +475,67 @@ Yanıtını SADECE şu JSON formatında ver:
     { "alt": "${focusKw}", "caption": "${focusKw} detaylı incelemesi" },
     { "alt": "${focusKw} detaylı rehber görseli", "caption": "${focusKw} için uzman önerileri" }
   ],
-  "h2_sections": [
-    "Konuya özel özgün 1. Bölüm H2 Başlığı",
-    "Konuya özel özgün 2. Bölüm H2 Başlığı",
-    "Konuya özel özgün 3. Bölüm H2 Başlığı",
-    "Konuya özel özgün 4. Bölüm H2 Başlığı",
-    "Konuya özel özgün 5. Bölüm H2 Başlığı"
-  ]
-}`;
+  "content_html": "<p>İlk cümlede <strong>${focusKw}</strong> geçen detaylı giriş...</p><h2>...</h2>"
+}
+`;
 
-  let outline = null;
   try {
-    const resOutline = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`, {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: outlinePrompt }] }],
-        generationConfig: { responseMimeType: "application/json" }
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 8192,
+          responseMimeType: "application/json"
+        }
       })
     });
-    const d = await resOutline.json();
-    outline = JSON.parse(d.candidates[0].content.parts[0].text);
+
+    if (res.ok) {
+      const d = await res.json();
+      const text = d.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) {
+        const parsed = JSON.parse(text);
+        if (parsed.content_html && parsed.content_html.length > 500) {
+          return parsed;
+        }
+      }
+    }
   } catch(e) {
-    console.error('Outline hatası:', e.message);
-    outline = {
-      title: `${focusKw.charAt(0).toUpperCase() + focusKw.slice(1)}: 2026 Kapsamlı Uzman Rehberi ve Tavsiyeler`,
-      meta_title: `${focusKw.charAt(0).toUpperCase() + focusKw.slice(1)}: 2026 Uzman Rehberi | Patistore`,
-      meta_description: `${focusKw} hakkında 2026 yılına özel 25 yıllık uzman rehberi.`,
-      image_prompts: [
-        { alt: `${focusKw}`, caption: `${focusKw} detaylı incelemesi` },
-        { alt: `${focusKw} beslenme ve bakım tüyoları`, caption: `${focusKw} için doğru beslenme ve bakım rehberi` }
-      ],
-      h2_sections: [
-        `${focusKw} Nedir ve Temel Önemi`,
-        `2026 Yılında ${focusKw} İçin Dikkat Edilmesi Gerekenler`,
-        `Klinik Deneyimler ve Uygulama Adımları`,
-        `Maliyetler, Fiyat Tabloları ve Karşılaştırmalar`,
-        `Sık Karşılaşılan Sorunlar ve Uzman Çözümleri`
-      ]
-    };
+    console.error('[-] Gemini 1.5-flash Hatası:', e.message);
   }
 
-  // Step 2: Generate Deep Content for Each Section (Ensuring 2500+ Words)
-  console.log(`    [*] 2/3: 2500+ Kelimelik 5 Derin Bölüm Yazılıyor...`);
-  let fullBodyHtml = '';
-
-  // Introduction
-  const introPrompt = `${masterSystemPrompt}
-HEDEF KONU: "${topic.title}"
-ODAK ANAHTAR KELİME: "${focusKw}"
-GÖREV: Bu makale için derin, etkileyici, okuyucunun acısını tanımlayan, ilk cümlesinde <strong>${focusKw}</strong> odak kelimesi geçen en az 300 kelimelik bir giriş bölümü yaz. HTML formatında (<p> etiketleriyle) sadece HTML çıktısı döndür.`;
+  // Backup fallback using gemini-1.5-pro if needed
   try {
-    const resIntro = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`, {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: introPrompt }] }] })
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 8192,
+          responseMimeType: "application/json"
+        }
+      })
     });
-    const d = await resIntro.json();
-    fullBodyHtml += d.candidates[0].content.parts[0].text.replace(/```html|```/g, '').trim() + '\n\n';
-  } catch(e) {}
 
-  // 5 H2 Sections (each 450-600 words with rich tables, lists, cases)
-  for (let i = 0; i < outline.h2_sections.length; i++) {
-    const secTitle = outline.h2_sections[i];
-    console.log(`       -> Bölüm ${i+1}/5 Yazılıyor: "${secTitle}"`);
-    const secPrompt = `${masterSystemPrompt}
-HEDEF KONU: "${topic.title}"
-ODAK ANAHTAR KELİME: "${focusKw}"
-YAZILACAK BÖLÜM BAŞLIĞI (H2): "${secTitle}"
-GÖREV: Bu başlık altında tam 500-600 kelimelik aşırı detaylı, zengin, doyurucu bir gövde yaz.
-İÇERİK UNSURLARI:
-- Cümleler kesinlikle 15 kelimeden KISA olmalı (<14 kelime).
-- Paragraflar 2-4 cümlelik mikro-paragraflar olmalı.
-- Geçiş kelimeleri bolca kullanılmalı.
-- ${i === 1 ? 'Karşılaştırmalı zengin bir HTML <table> tablosu ekle.' : ''}
-- ${i === 2 ? 'Maddeli bir rehber listesi (<ul><li>) ve yaşanmış gerçek bir vaka analizi kutusu ekle.' : ''}
-- Semantik LSI kelimeleri <strong>kalın</strong> yap.
-ÇIKTI: Sadece <h2>${secTitle}</h2> ve altındaki HTML içeriğini döndür (Markdown backtick olmadan).`;
-
-    try {
-      const resSec = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: secPrompt }] }] })
-      });
-      const d = await resSec.json();
-      fullBodyHtml += d.candidates[0].content.parts[0].text.replace(/```html|```/g, '').trim() + '\n\n';
-    } catch(e) {}
+    if (res.ok) {
+      const d = await res.json();
+      const text = d.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) {
+        return JSON.parse(text);
+      }
+    }
+  } catch(e) {
+    console.error('[-] Gemini Backup Hatası:', e.message);
   }
 
-  // Step 3: FAQ, 20-Keyword Summary, and Schema JSON-LD
-  console.log(`    [*] 3/3: 7 Soruluk SSS, 20 Kalın Terimli Özet ve Şema Ekleniyor...`);
-  const finalPrompt = `${masterSystemPrompt}
-HEDEF KONU: "${topic.title}"
-ODAK ANAHTAR KELİME: "${focusKw}"
-${internalLinksPrompt}
-GÖREV: Makalenin sonu için şu 3 bölümü HTML olarak eksiksiz yaz:
-1. 7 Soruluk kapsamlı SSS (Sıkça Sorulan Sorular) bölümü (<h2> ve <h3> ile).
-2. Schema.org uyumlu <script type="application/ld+json"> FAQPage JSON-LD bloğu.
-3. Tam 200 kelimelik, içinde 20 farklı anlamsal semantik kelimenin <strong>kalın</strong> olarak geçtiği "2026 Uzman Klinik Değerlendirmesi ve Özet" bölümü.
-4. Sıcak, okuyucuyu yoruma teşvik eden CTA kapanış paragrafı.
-ÇIKTI: Sadece HTML formatında döndür.`;
-
-  try {
-    const resFinal = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: finalPrompt }] }] })
-    });
-    const d = await resFinal.json();
-    fullBodyHtml += d.candidates[0].content.parts[0].text.replace(/```html|```/g, '').trim();
-  } catch(e) {}
-
-  return {
-    title: outline.title,
-    meta_title: outline.meta_title,
-    meta_description: outline.meta_description,
-    image_prompts: outline.image_prompts,
-    content_html: fullBodyHtml
-  };
+  return null;
 }
 
 // Master Execution Runner (20-Minute Cyclical Architecture)
