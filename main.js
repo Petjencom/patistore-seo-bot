@@ -381,6 +381,76 @@ async function generateUltraHDImages(topic, imagePrompts = []) {
   return results;
 }
 
+
+// Strict Title Sanitizer & Dynamic Variety Generator
+function generateDiverseTitle(rawTitle, focusKw, mode) {
+  let title = (rawTitle || '').trim();
+
+  // Banned repetitive phrases
+  const bannedPhrases = [
+    /7\s*altın\s*kural/gi,
+    /altın\s*kurallar?/gi,
+    /7\s*kural/gi,
+    /7\s*altin\s*kural/gi,
+    /bilmeniz\s*gereken\s*7/gi,
+    /7\s*onemli\s*ipucu/gi,
+    /7\s*ipucu/gi,
+    /7\s*madde/gi
+  ];
+
+  let hasBanned = false;
+  for (const b of bannedPhrases) {
+    if (b.test(title)) {
+      hasBanned = true;
+      title = title.replace(b, '').trim();
+    }
+  }
+
+  const cleanKw = focusKw.charAt(0).toUpperCase() + focusKw.slice(1);
+
+  if (hasBanned || title.length < 15 || !title.toLowerCase().includes(focusKw.toLowerCase())) {
+    const localTemplates = [
+      `${cleanKw}: 2026 Güncel Fiyatları, Hizmet Detayları ve Doğru Seçim Rehberi`,
+      `${cleanKw}: En Güvenilir Tavsiyeler, Kullanıcı Yorumları ve İpuçları (2026)`,
+      `${cleanKw}: Profesyonel Hizmet Seçerken Dikkat Edilmesi Gerekenler`,
+      `${cleanKw}: 2026 Yılında Güvenilir Hizmet Arayanlar İçin Kapsamlı Rehber`,
+      `${cleanKw}: Bölgesel Fiyat Listesi, Uzman Önerileri ve Klinik/Tesis İncelemesi`
+    ];
+
+    const breedTemplates = [
+      `${cleanKw}: Karakter Özellikleri, Beslenme Programı ve Bakım Kılavuzu`,
+      `${cleanKw}: 2026 Yılına Özel Kapsamlı Irk ve Günlük Bakım Rehberi`,
+      `${cleanKw}: Sağlık İpuçları, Egzersiz İhtiyacı ve Evde Yaşam Tavsiyeleri`,
+      `${cleanKw}: Veteriner Hekim Onaylı Tüy ve Beslenme Rehberi (2026)`,
+      `${cleanKw}: Kökeni, Eğitimi ve Sahiplenmeden Önce Bilinmesi Gerekenler`
+    ];
+
+    const careTemplates = [
+      `${cleanKw}: 2026 Güncel Maliyetleri, Klinik İpuçları ve Uzman Tavsiyeleri`,
+      `${cleanKw}: Evde Doğru Uygulama Adımları ve Veteriner Değerlendirmesi`,
+      `${cleanKw}: 2026 Yılında Evcil Hayvan Sahiplerinin Bilmesi Gereken Detaylar`,
+      `${cleanKw}: Bütçe Planlaması, Sağlık Önlemleri ve Adım Adım Bakım`,
+      `${cleanKw}: En Çok Merak Edilen Sorular, Çözümler ve 2026 Analizi`
+    ];
+
+    let chosenPool = localTemplates;
+    if (mode === 'breed') chosenPool = breedTemplates;
+    else if (mode === 'cost_care') chosenPool = careTemplates;
+
+    const randIdx = Math.floor(Math.random() * chosenPool.length);
+    title = chosenPool[randIdx];
+  }
+
+  // Ensure title starts with focus keyword cleanly
+  if (!title.toLowerCase().startsWith(focusKw.toLowerCase())) {
+    title = `${cleanKw}: ${title.replace(/^[^:]+:s*/, '')}`;
+  }
+
+  // Remove trailing or double colons
+  title = title.replace(/:s*:/g, ':').replace(/s+/g, ' ').trim();
+  return title;
+}
+
 // Generate Genuine 2500+ Word EEAT Article via Gemini (Multi-Section Deep Architecture)
 async function generateMasterArticle(topic, recentPosts = []) {
   const focusKw = topic.focus_keyword;
@@ -412,7 +482,9 @@ KATI DİL VE YAZIM KURALLARI:
 HEDEF KONU: "${topic.title}"
 ODAK ANAHTAR KELİME: "${focusKw}"
 
-BAŞLIK KURALLARI:
+BAŞLIK KURALLARI (ÇOK KATI):
+- "7 Altın Kural", "7 Kural", "Altın Kural", "7 İpucu", "7 Madde" kelimelerini KULLANMAK KESİNLİKLE YASAKTIR.
+- Başlıklar her makalede tamamen farklı, özgün ve konuya özel olmalıdır.
 - KESİNLİKLE "7 Altın Kural", "7 Kural", "Altın Kurallar" gibi klişe ve tekrar eden başlıklar KULLANMA.
 - Başlık konunun türüne göre son derece profesyonel, merak uyandırıcı, tıklama oranı (CTR) yüksek ve özgün olmalıdır.
 - Başlık mutlaka tam odak anahtar kelime ("${focusKw}") ile başlamalıdır.
@@ -686,8 +758,11 @@ async function runBot(options = {}) {
   const categoryId = await getOrCreateCategory(task.category);
 
   // 5. Post with Full RankMath 100/100 Meta Fields
+  const cleanFinalTitle = generateDiverseTitle(article.title, task.focus_keyword, task.mode);
+  const cleanMetaTitle = `${cleanFinalTitle.substring(0, 50)} | Patistore`;
+
   const postPayload = {
-    title: article.title,
+    title: cleanFinalTitle,
     content: article.content_html,
     status: status,
     categories: [categoryId],
@@ -695,7 +770,7 @@ async function runBot(options = {}) {
     featured_media: featuredMediaId || undefined,
     meta: {
       rank_math_focus_keyword: task.focus_keyword,
-      rank_math_title: article.meta_title || article.title,
+      rank_math_title: cleanMetaTitle,
       rank_math_description: article.meta_description || '',
       rank_math_robots: 'index,follow'
     }
