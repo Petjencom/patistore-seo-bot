@@ -43,9 +43,10 @@
     "fransiz-bulldog-bakimi",
     "kisirlastirilmis-kedi-mamasi-secimi",
     "besiktas-pet-kuafor",
-    "maine-coon-ozellikleri"
+    "maine-coon-ozellikleri",
+    "veteriner-muayene-ucretleri-2026"
   ],
   "last_run": "2026-09-04T08:12:15.355Z",
   "last_type": "evergreen",
-  "last_mode": "breed"
+  "last_mode": "cost_care"
 }
