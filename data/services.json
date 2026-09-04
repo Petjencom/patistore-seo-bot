@@ -1,0 +1,34 @@
+{
+  "services": [
+    {
+      "id": "veteriner",
+      "name": "Veteriner Kliniği",
+      "category": "Veteriner Rehberi",
+      "search_terms": ["Veteriner", "Nöbetçi Veteriner", "7/24 Acil Veteriner Kliniği", "Veteriner Sağlık Hizmetleri"]
+    },
+    {
+      "id": "pet-otel",
+      "name": "Pet Otel",
+      "category": "Pet Otel Rehberi",
+      "search_terms": ["Pet Otel", "Kedi Oteli", "Köpek Oteli", "Evcil Hayvan Pansiyonu"]
+    },
+    {
+      "id": "pet-taksi",
+      "name": "Pet Taksi",
+      "category": "Pet Taksi Hizmeti",
+      "search_terms": ["Pet Taksi", "Evcil Hayvan Nakli", "Şehirlerarası Pet Taşıma", "VIP Pet Taksi"]
+    },
+    {
+      "id": "pet-shop",
+      "name": "Pet Shop",
+      "category": "Pet Shop Rehberi",
+      "search_terms": ["Pet Shop", "Evcil Hayvan Malzemeleri", "Mama ve Aksesuar Mağazaları"]
+    },
+    {
+      "id": "pet-kuafor",
+      "name": "Pet Kuaför",
+      "category": "Pet Kuaför & Bakım",
+      "search_terms": ["Pet Kuaför", "Kedi Köpek Tıraşı", "Anestezisiz Kedi Tıraşı", "Pet SPA"]
+    }
+  ]
+}
