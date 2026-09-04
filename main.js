@@ -301,7 +301,7 @@ KATI YAZIM VE DİL KURALLARI:
 10. BAŞLIK KURALI: "7 Altın Kural", "7 Kural", "7 İpucu" gibi kalıplar KULLANILMAYACAK.
 ${internalLinksPrompt}
 
-ÇIKTI: Sadece ve sadece makalenin zengin HTML kodunu (<p>, <h2>, <h3>, <table>, <ul>, <script>) döndür. Markdown backtick (```html) koyma.
+ÇIKTI: Sadece ve sadece makalenin zengin HTML kodunu (<p>, <h2>, <h3>, <table>, <ul>, <script>) döndür. Markdown backtick koyma.
 `;
 
   try {
