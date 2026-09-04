@@ -10,8 +10,9 @@
     "kadıköy-veteriner",
     "Yavru Köpeklerde Tuvalet Eğitimi: Adım Adım Başarı Rehberi",
     "kadıköy-pet-otel",
-    "Kısırlaştırılmış Kedi Maması Seçerken Dikkat Edilmesi Gereken 7 Kural"
+    "Kısırlaştırılmış Kedi Maması Seçerken Dikkat Edilmesi Gereken 7 Kural",
+    "kadıköy-pet-taksi"
   ],
-  "last_run": "2026-09-04T04:11:30.666Z",
-  "last_type": "evergreen"
+  "last_run": "2026-09-04T05:10:35.429Z",
+  "last_type": "local"
 }
