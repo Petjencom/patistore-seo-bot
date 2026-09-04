@@ -168,7 +168,7 @@ async function uploadImage(imageBuffer, filename, altText, caption) {
           description: altText
         })
       });
-      console.log(`[+] 16:9 AI Görseli Yüklendi: ${filename} (ID: ${media.id}) - Alt: '${altText}'`);
+      console.log(`[+] %100 Uyumlu 16:9 AI Görseli Yüklendi: ${filename} (ID: ${media.id}) - Alt: '${altText}'`);
       return { id: media.id, source_url: media.source_url || media.guid?.rendered };
     }
   } catch (e) {
@@ -177,44 +177,42 @@ async function uploadImage(imageBuffer, filename, altText, caption) {
   return null;
 }
 
-// 3. 100% Pure AI Image Generator (16:9 Landscape - 1200x675)
-async function generateThreeImages(topic) {
+// 3. Dynamic %100 Contextual AI Image Generator (16:9 Landscape - 1200x675)
+async function generateContextualImages(topic, imagePrompts = []) {
   const focusKw = topic.focus_keyword || 'evcil hayvan';
-  const title = topic.title || '';
   const baseSlug = slugifyTurkish(focusKw);
 
-  const imageConfigs = [
+  // Default fallback prompts if AI did not provide explicit image prompts
+  const configs = imagePrompts.length === 3 ? imagePrompts : [
     {
-      suffix: 'ana-rehber',
       alt: `${focusKw}`,
-      caption: `${title} uzman rehberi`,
-      aiPrompt: `Award-winning hyperrealistic 8k studio photo of ${focusKw}, horizontal landscape 16:9, volumetric soft studio lighting, ultra sharp focus, detailed fur texture, Hasselblad photography, clean modern background`
+      caption: `${topic.title} uzman rehberi görseli`,
+      prompt: `Award-winning hyperrealistic 8k studio photo of ${focusKw}, horizontal landscape 16:9, soft volumetric lighting, ultra sharp focus, realistic details, clean modern background`
     },
     {
-      suffix: 'beslenme-bakim',
-      alt: `${focusKw} beslenme ve günlük bakım tüyoları`,
-      caption: `${focusKw} için doğru beslenme ve bakım rutini`,
-      aiPrompt: `Hyperrealistic 8k photography of ${focusKw} with healthy nutrition food bowl, horizontal landscape 16:9, bright modern interior living room, natural warm sunlight, cinematic shot`
+      alt: `${focusKw} beslenme ve bakım detayları`,
+      caption: `${focusKw} için doğru beslenme ve günlük bakım tüyoları`,
+      prompt: `Hyperrealistic 8k detailed photography of ${focusKw} during care and nutrition, horizontal landscape 16:9, bright natural interior lighting, highly detailed`
     },
     {
-      suffix: 'saglik-klinik',
-      alt: `${focusKw} klinik kontrolleri ve sağlık rehberi`,
-      caption: `${focusKw} sağlığı için veteriner hekim önerileri`,
-      aiPrompt: `Professional 8k photo of ${focusKw} in a modern clean veterinary clinic examination table, gentle veterinarian hands, horizontal landscape 16:9, soft medical lighting, peaceful atmosphere`
+      alt: `${focusKw} veteriner kontrolü ve sağlık`,
+      caption: `${focusKw} sağlığı için klinik rehber ve uzman önerileri`,
+      prompt: `Professional 8k photo of ${focusKw} in a modern clean veterinary clinic examination, gentle veterinarian, horizontal landscape 16:9, medical lighting`
     }
   ];
 
   const results = [];
 
-  for (let idx = 0; idx < imageConfigs.length; idx++) {
-    const cfg = imageConfigs[idx];
-    const filename = `${baseSlug}-${cfg.suffix}-ai-patistore.jpg`;
+  for (let idx = 0; idx < configs.length; idx++) {
+    const cfg = configs[idx];
+    const filename = `${baseSlug}-gorsel-${idx + 1}-ai-patistore.jpg`;
     console.log(`    [*] AI Görsel ${idx + 1}/3 Üretiliyor (16:9 Yatay - 1200x675): "${cfg.alt}"`);
 
     let buffer = null;
 
     try {
-      const encoded = encodeURIComponent(cfg.aiPrompt);
+      const fullPrompt = `${cfg.prompt}, photorealistic 8k, horizontal landscape 16:9, cinematic studio lighting, masterpiece, no text, no watermark`;
+      const encoded = encodeURIComponent(fullPrompt);
       const aiUrl = `https://image.pollinations.ai/prompt/${encoded}?width=1200&height=675&nologo=true&model=flux`;
       const res = await fetch(aiUrl);
       if (res.ok) {
@@ -240,8 +238,8 @@ async function generateThreeImages(topic) {
   return results;
 }
 
-// 4. Master 2500+ Word EEAT & RankMath 100/100 Content Generator
-async function generateMasterArticle(topic, recentPosts, inlineImages = []) {
+// 4. Master 2500+ Word EEAT & RankMath 100/100 Content Generator with Custom Image Prompts
+async function generateMasterArticle(topic, recentPosts) {
   const focusKw = topic.focus_keyword;
   const isLocal = Boolean(topic.city && topic.district && topic.service);
   const internalLinks = recentPosts.slice(0, 8).map(p => `- Başlık: "${p.title}", Link: "${p.link}"`).join('\n');
@@ -250,7 +248,7 @@ async function generateMasterArticle(topic, recentPosts, inlineImages = []) {
 Sen; 20 yılı aşkın deneyime sahip Kıdemli bir SEO Stratejisti, Veri Odaklı İçerik Mimarı ve aynı zamanda tam 25 yıldır evinde kedi, köpek ve egzotik dostlar büyütmüş, veteriner literatürünü yakından takip eden tutkulu bir Evcil Hayvan Uzmanısın.
 
 GÖREVİN:
-Aşağıda verilen anahtar kelime ve konu doğrultusunda; Google'ın en güncel çekirdek güncellemeleriyle (Helpful Content System, Spam Updates, EEAT) ve RankMath SEO algoritmasıyla %100 uyumlu (100/100 Skor), MİNİMUM 2500 KELİMELİK dev bir blog rehberi üretmektir.
+Aşağıda verilen anahtar kelime ve konu doğrultusunda; Google'ın en güncel çekirdek güncellemeleriyle (Helpful Content System, Spam Updates, EEAT) ve RankMath SEO algoritmasıyla %100 uyumlu (100/100 Skor), MİNİMUM 2500 KELİMELİK dev bir blog rehberi ve BU REHBERE %100 BİREBİR ÖRTÜŞEN 3 ADET İNGİLİZCE YAPAY ZEKA GÖRSEL PROMPTU üretmektir.
 
 KRİTİK RANKMATH 100/100 KURALLARI:
 1. SEO Başlığı (H1) & Meta Başlığı: "${focusKw}" tam kelime öbeğini YALIN HALDE İÇERMELİ, AYNI ZAMANDA MUTLAKA BİR RAKAM (Örn: "2026", "7 Altın Kural", "5 Kritik İpucu") ve Güçlü Kelime (Uzman Rehberi, Eksiksiz) içermelidir.
@@ -298,16 +296,33 @@ ${internalLinks || "https://www.patistore.net/pet-kuafor/"}
 
 ---
 
-### 🚫 YASAKLAR
-- "Keyword stuffing" yapmak yasaktır.
-- "Günümüz dünyasında...", "Evcil hayvanlar hayatımızın neşesidir..." gibi yapay zeka klişeleriyle başlamak YASAKTIR.
-- 15 kelime ve üzeri tek bir cümle dahi kurmak KESİNLİKLE YASAKTIR.
+### 🖼️ %100 KONUYLA ÖRTÜŞEN 3 GÖRSEL PROMPTU (İNGİLİZCE):
+1. Görsel 1: Konunun ana temasını (tam ırk/hizmet/vaka ortamını) anlatan İngilizce prompt. Alt etiketi: "${focusKw}".
+2. Görsel 2: Yazının 2. bölümündeki beslenme/bakım/hizmet aşamasını anlatan detaylı İngilizce prompt. Alt etiketi: Konunun en geçerli semantik kelimesi.
+3. Görsel 3: Yazının 4. bölümündeki sağlık/kontrol/klinik aşamasını anlatan detaylı İngilizce prompt. Alt etiketi: Konunun 2. geçerli semantik kelimesi.
 
 ÇIKTI FORMATI (DÜZ GEÇERLİ JSON):
 {
   "title": "${focusKw.charAt(0).toUpperCase() + focusKw.slice(1)}: 2026 Yılında Bilmeniz Gereken 7 Altın Kural",
   "meta_title": "${focusKw.charAt(0).toUpperCase() + focusKw.slice(1)}: 2026 İçin 7 Altın Kural | Patistore",
   "meta_description": "${focusKw} hakkında 2026 yılına özel 25 yıllık uzman rehberi. Beslenme, bakım ve sağlık tüyolarını hemen keşfedin.",
+  "image_prompts": [
+    {
+      "alt": "${focusKw}",
+      "caption": "${focusKw} detaylı incelemesi",
+      "prompt": "Highly detailed 8k photography of..."
+    },
+    {
+      "alt": "konuyla ilgili 1. semantik alt etiket",
+      "caption": "...",
+      "prompt": "Detailed 8k photography of..."
+    },
+    {
+      "alt": "konuyla ilgili 2. semantik alt etiket",
+      "caption": "...",
+      "prompt": "Detailed 8k photography of..."
+    }
+  ],
   "content_html": "<p>...</p><h2>...</h2>"
 }
 `;
@@ -331,22 +346,7 @@ ${internalLinks || "https://www.patistore.net/pet-kuafor/"}
       const data = await res.json();
       const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (rawText) {
-        const parsed = cleanAndParseJSON(rawText);
-
-        if (parsed && inlineImages.length >= 2 && parsed.content_html) {
-          const imgHtml1 = `<figure class="wp-block-image size-large" style="margin:30px 0; text-align:center;"><img src="${inlineImages[0].url}" alt="${inlineImages[0].alt}" style="width:100%; max-width:1200px; height:auto; aspect-ratio:16/9; object-fit:cover; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.08);" /><figcaption style="text-align:center; font-size:13px; color:#64748b; margin-top:8px;">${inlineImages[0].caption}</figcaption></figure>`;
-          const imgHtml2 = `<figure class="wp-block-image size-large" style="margin:30px 0; text-align:center;"><img src="${inlineImages[1].url}" alt="${inlineImages[1].alt}" style="width:100%; max-width:1200px; height:auto; aspect-ratio:16/9; object-fit:cover; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.08);" /><figcaption style="text-align:center; font-size:13px; color:#64748b; margin-top:8px;">${inlineImages[1].caption}</figcaption></figure>`;
-
-          let h2Count = 0;
-          parsed.content_html = parsed.content_html.replace(/<\/h2>/g, (match) => {
-            h2Count++;
-            if (h2Count === 2) return match + '\n' + imgHtml1;
-            if (h2Count === 4) return match + '\n' + imgHtml2;
-            return match;
-          });
-        }
-
-        return parsed;
+        return cleanAndParseJSON(rawText);
       }
     } else {
       console.error('Gemini API Hatası:', await res.text());
@@ -360,7 +360,7 @@ ${internalLinks || "https://www.patistore.net/pet-kuafor/"}
 // 5. Main Execution Engine (Hourly / Batch)
 async function runBatch(count = 1, status = 'publish') {
   console.log('================================================================');
-  console.log(`🐾 Patistore.net SAATLİK 1 İÇERİK (RankMath 100/100) Otomasyonu`);
+  console.log(`🐾 Patistore.net %100 Örtüşen AI Görselli & RankMath 100/100 Botu`);
   console.log(`Hedef: ${count} Adet Kapsamlı İçerik | Durum: ${status}`);
   console.log('================================================================\n');
 
@@ -403,7 +403,6 @@ async function runBatch(count = 1, status = 'publish') {
   const selectedTasks = [];
 
   for (let i = 0; i < count; i++) {
-    // Alternate between evergreen and local for hourly variety
     if (lastType === 'local' && evergreenPool.length > 0) {
       const task = evergreenPool.shift();
       task.type = 'evergreen';
@@ -433,24 +432,38 @@ async function runBatch(count = 1, status = 'publish') {
     console.log(`    -> Odak Kelime: "${task.focus_keyword}"`);
     console.log(`    -> Kalıcı Bağlantı: "${exactSlug}"`);
 
-    // 1. Generate 3 Pure AI Images (16:9 Landscape - 1200x675)
-    console.log(`    [*] 3 Adet 16:9 Yatay Yapay Zeka Görseli Üretiliyor...`);
-    const uploadedImages = await generateThreeImages(task);
-    const featuredMediaId = uploadedImages[0]?.id;
-    const inContentImages = uploadedImages.slice(1);
-
-    // 2. Generate 2500+ Word EEAT Article
-    console.log(`    [*] 25 Yıllık Deneyim & RankMath 100/100 Kriterleriyle İçerik Üretiliyor...`);
-    const article = await generateMasterArticle(task, recentPosts, inContentImages);
+    // 1. Generate 2500+ Word EEAT Article and Specific Image Prompts
+    console.log(`    [*] 25 Yıllık Deneyim & %100 Konu Uyumlu Görsel Prompları Hazırlanıyor...`);
+    const article = await generateMasterArticle(task, recentPosts);
     if (!article) {
       console.log(`    [x] İçerik üretilemedi, atlanıyor.`);
       continue;
     }
 
-    // 3. Category Management
+    // 2. Generate 3 %100 Matching AI Images based on Article's exact prompts
+    console.log(`    [*] Konuya ve Başlıklara %100 Birebir Örtüşen 3 AI Görseli Üretiliyor...`);
+    const uploadedImages = await generateContextualImages(task, article.image_prompts || []);
+    const featuredMediaId = uploadedImages[0]?.id;
+    const inContentImages = uploadedImages.slice(1);
+
+    // 3. Inject In-Content Images into HTML at exact headings
+    if (inContentImages.length >= 2 && article.content_html) {
+      const imgHtml1 = `<figure class="wp-block-image size-large" style="margin:30px 0; text-align:center;"><img src="${inContentImages[0].url}" alt="${inContentImages[0].alt}" style="width:100%; max-width:1200px; height:auto; aspect-ratio:16/9; object-fit:cover; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.08);" /><figcaption style="text-align:center; font-size:13px; color:#64748b; margin-top:8px;">${inContentImages[0].caption}</figcaption></figure>`;
+      const imgHtml2 = `<figure class="wp-block-image size-large" style="margin:30px 0; text-align:center;"><img src="${inContentImages[1].url}" alt="${inContentImages[1].alt}" style="width:100%; max-width:1200px; height:auto; aspect-ratio:16/9; object-fit:cover; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.08);" /><figcaption style="text-align:center; font-size:13px; color:#64748b; margin-top:8px;">${inContentImages[1].caption}</figcaption></figure>`;
+
+      let h2Count = 0;
+      article.content_html = article.content_html.replace(/<\/h2>/g, (match) => {
+        h2Count++;
+        if (h2Count === 2) return match + '\n' + imgHtml1;
+        if (h2Count === 4) return match + '\n' + imgHtml2;
+        return match;
+      });
+    }
+
+    // 4. Category Management
     const categoryId = await getOrCreateCategory(task.category);
 
-    // 4. Post with Full RankMath 100/100 Meta Fields
+    // 5. Post with Full RankMath 100/100 Meta Fields
     const postPayload = {
       title: article.title,
       content: article.content_html,
@@ -482,7 +495,7 @@ async function runBatch(count = 1, status = 'publish') {
         console.log(`       🔗 Link: ${created.link}`);
         console.log(`       ⭐ Odak Kelime: "${task.focus_keyword}"`);
         console.log(`       📝 Başlık: "${article.title}"`);
-        console.log(`       🖼️ Yüklenen AI Görsel Sayısı: ${uploadedImages.length} Adet (16:9 Yatay)`);
+        console.log(`       🖼️ Yüklenen AI Görsel Sayısı: ${uploadedImages.length} Adet (16:9 Yatay - %100 Konu Uyumlu)`);
         successCount++;
         const slugKey = task.slug_key || task.title;
         publishedSlugs.add(slugKey);
