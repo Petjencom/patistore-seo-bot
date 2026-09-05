@@ -23,6 +23,10 @@ jobs:
         with:
           node-version: 20
 
+      - name: Bagimliliklari Yukle
+        run: |
+          npm install
+
       - name: 20 Dakikalik 2500+ Kelime RankMath 100/100 Icerigi Yayina Al
         env:
           WP_URL: ${{ secrets.WP_URL }}
