@@ -161,6 +161,7 @@ async function uploadImage(imageBuffer, filename, altText, caption) {
 }
 
 // Helper to escape XML special characters
+// Helper to escape XML
 function escapeXml(unsafe) {
   return (unsafe || '').replace(/[<>&'"]/g, (c) => {
     switch (c) {
@@ -173,186 +174,118 @@ function escapeXml(unsafe) {
   });
 }
 
-// 100% Breed-Matched and Category Photo Library (High-Res 16:9 Landscape)
-const verifiedPhotoLibrary = {
-  // === KÖPEK IRKLARI ===
-  "pomeranian": [
-    "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1546975490-a79abdd54533?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "french_bulldog": [
-    "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1583511655826-05700d52f4d9?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "golden_retriever": [
-    "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1633722715463-d30f4f325e24?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "labrador": [
-    "https://images.unsplash.com/photo-1591769225440-811ad7d6eab2?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "maltese": [
-    "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "poodle": [
-    "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "cane_corso": [
-    "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "rottweiler": [
-    "https://images.unsplash.com/photo-1567752881298-894bb81f9379?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "husky": [
-    "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "chihuahua": [
-    "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "kangal": [
-    "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "alman_kurdu": [
-    "https://images.unsplash.com/photo-1589941013453-ec89f33b5455?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
+// Text word-wrapper for banners
+function wrapBannerText(text, maxCharsPerLine = 22) {
+  const words = text.split(/\s+/);
+  const lines = [];
+  let currentLine = '';
 
-  // === KEDİ IRKLARI ===
-  "british_shorthair": [
-    "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "scottish_fold": [
-    "https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "siyam": [
-    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "van_kedisi": [
-    "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "maine_coon": [
-    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "ragdoll": [
-    "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "bengal": [
-    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "iran_kedisi": [
-    "https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "sphynx": [
-    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "tekir": [
-    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
+  for (const word of words) {
+    if ((currentLine + ' ' + word).trim().length <= maxCharsPerLine) {
+      currentLine = (currentLine + ' ' + word).trim();
+    } else {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+  return lines;
+}
 
-  // === HİZMET VE BAKIM KATEGORİLERİ ===
-  "pet_taksi": [
-    "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "pet_otel": [
-    "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "pet_kuafor": [
-    "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1535294435445-d7249524ef2e?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "veteriner": [
-    "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "pet_shop": [
-    "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "dog_general": [
-    "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&h=675&q=85"
-  ],
-  "cat_general": [
-    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&h=675&q=85",
-    "https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&h=675&q=85"
-  ]
-};
+// Predefined vibrant aesthetic mesh gradient color palettes
+const COLOR_PALETTES = [
+  {
+    bg: '#ec4899',
+    c1: '#f43f5e', c2: '#8b5cf6', c3: '#3b82f6', c4: '#06b6d4', c5: '#fbbf24', c6: '#d946ef'
+  },
+  {
+    bg: '#6366f1',
+    c1: '#3b82f6', c2: '#ec4899', c3: '#f97316', c4: '#10b981', c5: '#a855f7', c6: '#e11d48'
+  },
+  {
+    bg: '#0ea5e9',
+    c1: '#06b6d4', c2: '#3b82f6', c3: '#a855f7', c4: '#f43f5e', c5: '#fbbf24', c6: '#10b981'
+  },
+  {
+    bg: '#f97316',
+    c1: '#ef4444', c2: '#f59e0b', c3: '#ec4899', c4: '#8b5cf6', c5: '#06b6d4', c6: '#10b981'
+  },
+  {
+    bg: '#8b5cf6',
+    c1: '#d946ef', c2: '#ec4899', c3: '#3b82f6', c4: '#06b6d4', c5: '#facc15', c6: '#f43f5e'
+  }
+];
 
-// Generate Exactly 2 Ultra-HD Images (1 Featured Cover + 1 In-Content, 1200x675) with Burnt-in Sharp Typography
+function generateVibrantMeshSvg(text, paletteIndex = 0) {
+  const palette = COLOR_PALETTES[paletteIndex % COLOR_PALETTES.length];
+  const upperText = (text || '').toLocaleUpperCase('tr-TR');
+  const lines = wrapBannerText(upperText, 20);
+
+  let fontSize = 64;
+  if (lines.length > 2) fontSize = 52;
+  if (lines.length > 3) fontSize = 42;
+
+  const lineHeight = fontSize * 1.25;
+  const totalHeight = lines.length * lineHeight;
+  const startY = (675 - totalHeight) / 2 + (fontSize * 0.9);
+
+  const textSvgLines = lines.map((line, idx) => {
+    const yPos = startY + (idx * lineHeight);
+    return `<text x="600" y="${yPos}" text-anchor="middle" font-family="'Cinzel', 'Playfair Display', 'Times New Roman', 'Georgia', serif" font-size="${fontSize}" font-weight="700" fill="#ffffff" filter="url(#shadow)" letter-spacing="2">${escapeXml(line)}</text>`;
+  }).join('\n');
+
+  return `
+  <svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="95" result="blur" />
+      </filter>
+      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="rgba(0,0,0,0.3)" />
+      </filter>
+    </defs>
+
+    <!-- Background Base -->
+    <rect width="1200" height="675" fill="${palette.bg}" />
+
+    <!-- Vibrant Blurred Color Blobs for Authentic Mesh Gradient -->
+    <g filter="url(#blur)">
+      <circle cx="200" cy="180" r="280" fill="${palette.c1}" opacity="0.9" />
+      <circle cx="950" cy="160" r="320" fill="${palette.c2}" opacity="0.85" />
+      <circle cx="600" cy="120" r="260" fill="${palette.c3}" opacity="0.85" />
+      <circle cx="150" cy="520" r="300" fill="${palette.c4}" opacity="0.85" />
+      <circle cx="980" cy="520" r="320" fill="${palette.c5}" opacity="0.9" />
+      <circle cx="550" cy="550" r="290" fill="${palette.c6}" opacity="0.85" />
+    </g>
+
+    <!-- Centered High-End Typography -->
+    ${textSvgLines}
+  </svg>
+  `;
+}
+
+// Generate Exactly 2 Ultra-HD Images (1 Featured Cover + 1 In-Content, 1200x675) with Vibrant Mesh Gradient
 async function generateUltraHDImages(topic, articleTitle) {
   const focusKw = topic.focus_keyword;
   const baseSlug = slugifyTurkish(focusKw);
   const cleanKw = focusKw.charAt(0).toUpperCase() + focusKw.slice(1);
   const finalTitle = articleTitle || `${cleanKw}: 2026 Kapsamlı Uzman Rehberi`;
 
-  const textToSearch = (topic.title + ' ' + topic.focus_keyword + ' ' + (topic.category || '')).toLowerCase();
-  let selectedUrls = verifiedPhotoLibrary.dog_general;
-
-  if (textToSearch.includes("pomeranian") || textToSearch.includes("boo")) selectedUrls = verifiedPhotoLibrary.pomeranian;
-  else if (textToSearch.includes("french bulldog") || textToSearch.includes("fransız bulldog") || textToSearch.includes("buldog")) selectedUrls = verifiedPhotoLibrary.french_bulldog;
-  else if (textToSearch.includes("golden")) selectedUrls = verifiedPhotoLibrary.golden_retriever;
-  else if (textToSearch.includes("labrador")) selectedUrls = verifiedPhotoLibrary.labrador;
-  else if (textToSearch.includes("maltese") || textToSearch.includes("maltez")) selectedUrls = verifiedPhotoLibrary.maltese;
-  else if (textToSearch.includes("poodle") || textToSearch.includes("kaniş") || textToSearch.includes("toypoodle")) selectedUrls = verifiedPhotoLibrary.poodle;
-  else if (textToSearch.includes("cane corso")) selectedUrls = verifiedPhotoLibrary.cane_corso;
-  else if (textToSearch.includes("rottweiler")) selectedUrls = verifiedPhotoLibrary.rottweiler;
-  else if (textToSearch.includes("husky") || textToSearch.includes("sibirya kurdu")) selectedUrls = verifiedPhotoLibrary.husky;
-  else if (textToSearch.includes("chihuahua") || textToSearch.includes("şivava")) selectedUrls = verifiedPhotoLibrary.chihuahua;
-  else if (textToSearch.includes("kangal")) selectedUrls = verifiedPhotoLibrary.kangal;
-  else if (textToSearch.includes("alman kurdu") || textToSearch.includes("shepherd")) selectedUrls = verifiedPhotoLibrary.alman_kurdu;
-  else if (textToSearch.includes("british")) selectedUrls = verifiedPhotoLibrary.british_shorthair;
-  else if (textToSearch.includes("scottish")) selectedUrls = verifiedPhotoLibrary.scottish_fold;
-  else if (textToSearch.includes("siyam")) selectedUrls = verifiedPhotoLibrary.siyam;
-  else if (textToSearch.includes("van kedisi")) selectedUrls = verifiedPhotoLibrary.van_kedisi;
-  else if (textToSearch.includes("maine coon")) selectedUrls = verifiedPhotoLibrary.maine_coon;
-  else if (textToSearch.includes("ragdoll")) selectedUrls = verifiedPhotoLibrary.ragdoll;
-  else if (textToSearch.includes("bengal")) selectedUrls = verifiedPhotoLibrary.bengal;
-  else if (textToSearch.includes("iran") || textToSearch.includes("persian")) selectedUrls = verifiedPhotoLibrary.iran_kedisi;
-  else if (textToSearch.includes("sphynx") || textToSearch.includes("tüysüz")) selectedUrls = verifiedPhotoLibrary.sphynx;
-  else if (textToSearch.includes("tekir")) selectedUrls = verifiedPhotoLibrary.tekir;
-  else if (textToSearch.includes("taksi") || textToSearch.includes("taxi") || textToSearch.includes("transfer")) selectedUrls = verifiedPhotoLibrary.pet_taksi;
-  else if (textToSearch.includes("otel") || textToSearch.includes("pansiyon") || textToSearch.includes("konaklama")) selectedUrls = verifiedPhotoLibrary.pet_otel;
-  else if (textToSearch.includes("kuaför") || textToSearch.includes("kuafor") || textToSearch.includes("tıraş") || textToSearch.includes("banyo")) selectedUrls = verifiedPhotoLibrary.pet_kuafor;
-  else if (textToSearch.includes("veteriner") || textToSearch.includes("aşı") || textToSearch.includes("klinik") || textToSearch.includes("kısırlaştırma") || textToSearch.includes("muayene")) selectedUrls = verifiedPhotoLibrary.veteriner;
-  else if (textToSearch.includes("shop") || textToSearch.includes("mama") || textToSearch.includes("kum") || textToSearch.includes("ürün")) selectedUrls = verifiedPhotoLibrary.pet_shop;
-  else if (textToSearch.includes("kedi")) selectedUrls = verifiedPhotoLibrary.cat_general;
-
+  const inContentText = `${cleanKw} Rehberi ve Detaylar`;
   const inContentAlt = `${cleanKw} detaylı rehberi ve 2026 uzman tavsiyeleri`;
-  const inContentCaption = `${cleanKw} için doğru beslenme, bakım ve sağlık tüyoları`;
+  const inContentCaption = `${cleanKw} hakkında en çok merak edilenler ve uzman değerlendirmesi`;
 
   const configs = [
     {
-      badge: "🐾 PATISTORE UZMAN REHBERİ",
-      mainText: cleanKw,
-      subText: finalTitle,
+      bannerText: focusKw,
+      paletteIdx: 0,
       alt: focusKw,
       caption: finalTitle,
       filename: `${baseSlug}-kapak-gorseli-patistore.jpg`
     },
     {
-      badge: "⭐ KLİNİK ANALİZ & TAVSİYELER",
-      mainText: `${cleanKw} Rehberi`,
-      subText: `${cleanKw} İçin 2026 Veteriner Hekim Tavsiyeleri ve Bakım İpuçları`,
+      bannerText: inContentText,
+      paletteIdx: 1,
       alt: inContentAlt,
       caption: inContentCaption,
       filename: `${baseSlug}-detay-rehberi-patistore.jpg`
@@ -363,56 +296,33 @@ async function generateUltraHDImages(topic, articleTitle) {
 
   for (let idx = 0; idx < configs.length; idx++) {
     const cfg = configs[idx];
-    console.log(`    [*] 16:9 HD Görsel ${idx + 1}/2 Hazırlanıyor (Başlık ve Odak Kelime Yazılı): "${cfg.alt}"`);
+    console.log(`    [*] 16:9 Canlı Mesh Gradient Görsel ${idx + 1}/2 Üretiliyor (Yazı: "${cfg.bannerText}")`);
 
-    const targetUrl = selectedUrls[idx % selectedUrls.length];
     try {
-      const res = await fetch(targetUrl);
-      if (res.ok) {
-        let baseBuffer = Buffer.from(await res.arrayBuffer());
+      const svgString = generateVibrantMeshSvg(cfg.bannerText, cfg.paletteIdx);
+      const svgBuffer = Buffer.from(svgString);
 
-        // Use sharp to composite rich gradient and bold typography directly on the JPEG
-        if (sharp) {
-          const escapedBadge = escapeXml(cfg.badge);
-          const escapedMain = escapeXml(cfg.mainText);
-          const escapedSub = escapeXml(cfg.subText);
+      let jpgBuffer;
+      if (sharp) {
+        jpgBuffer = await sharp(svgBuffer)
+          .resize(1200, 675)
+          .jpeg({ quality: 92 })
+          .toBuffer();
+      } else {
+        jpgBuffer = svgBuffer;
+      }
 
-          const svgOverlay = `
-          <svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="overlayGrad" x1="0" y1="1" x2="0" y2="0">
-                <stop offset="0%" stop-color="#0f172a" stop-opacity="0.95" />
-                <stop offset="50%" stop-color="#0f172a" stop-opacity="0.65" />
-                <stop offset="100%" stop-color="#0f172a" stop-opacity="0.0" />
-              </linearGradient>
-            </defs>
-            <rect x="0" y="380" width="1200" height="295" fill="url(#overlayGrad)" />
-            <rect x="60" y="470" width="280" height="36" rx="8" fill="#ff6b00" />
-            <text x="75" y="494" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="bold" fill="#ffffff" letter-spacing="1.5">${escapedBadge}</text>
-            <text x="60" y="555" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="900" fill="#ffffff">${escapedMain}</text>
-            <text x="60" y="605" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="500" fill="#e2e8f0">${escapedSub}</text>
-          </svg>
-          `;
-
-          baseBuffer = await sharp(baseBuffer)
-            .resize(1200, 675, { fit: 'cover' })
-            .composite([{ input: Buffer.from(svgOverlay) }])
-            .jpeg({ quality: 90 })
-            .toBuffer();
-        }
-
-        const uploaded = await uploadImage(baseBuffer, cfg.filename, cfg.alt, cfg.caption);
-        if (uploaded) {
-          results.push({
-            id: uploaded.id,
-            url: uploaded.source_url,
-            alt: cfg.alt,
-            caption: cfg.caption
-          });
-        }
+      const uploaded = await uploadImage(jpgBuffer, cfg.filename, cfg.alt, cfg.caption);
+      if (uploaded) {
+        results.push({
+          id: uploaded.id,
+          url: uploaded.source_url,
+          alt: cfg.alt,
+          caption: cfg.caption
+        });
       }
     } catch (e) {
-      console.error(`Görsel ${idx + 1} hazırlanamadı:`, e.message);
+      console.error(`Görsel ${idx + 1} oluşturulamadı:`, e.message);
     }
   }
 
@@ -674,20 +584,12 @@ async function main() {
     const featuredImage = images[0] || null;
     const inContentImage = images[1] || null;
 
-    // 3. Inject In-Content Image into HTML with Floating Title Banner Box (after 2nd H2 Heading)
+    // 3. Inject In-Content Image into HTML (after 2nd H2 Heading)
     if (inContentImage && article.content_html) {
-      const cleanKw = task.focus_keyword.charAt(0).toUpperCase() + task.focus_keyword.slice(1);
       const imgHtml = `
-<figure class="wp-block-image size-large" style="margin:35px 0; text-align:center; position:relative;">
-  <div style="position:relative; display:inline-block; width:100%; max-width:1200px; border-radius:14px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.15);">
-    <img src="${inContentImage.url}" alt="${inContentImage.alt}" style="width:100%; height:auto; aspect-ratio:16/9; object-fit:cover; display:block;" />
-    <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.7) 60%, transparent 100%); padding:25px 24px 18px 24px; text-align:left;">
-      <span style="background:#ff6b00; color:#ffffff; font-size:12px; font-weight:800; padding:4px 12px; border-radius:6px; letter-spacing:1px; text-transform:uppercase; display:inline-block; margin-bottom:6px;">🐾 PATISTORE UZMAN REHBERİ</span>
-      <h3 style="color:#ffffff; font-size:22px; font-weight:800; margin:4px 0; text-shadow:0 2px 4px rgba(0,0,0,0.6);">${cleanKw} Rehberi ve Önemli Detaylar</h3>
-      <p style="color:#e2e8f0; font-size:14px; margin:0; opacity:0.95;">${inContentImage.caption}</p>
-    </div>
-  </div>
-  <figcaption style="text-align:center; font-size:13px; color:#64748b; margin-top:10px; font-style:italic;">${inContentImage.caption}</figcaption>
+<figure class="wp-block-image size-large" style="margin:35px 0; text-align:center;">
+  <img src="${inContentImage.url}" alt="${inContentImage.alt}" style="width:100%; max-width:1200px; height:auto; aspect-ratio:16/9; object-fit:cover; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.08);" />
+  <figcaption style="text-align:center; font-size:13px; color:#64748b; margin-top:8px;">${inContentImage.caption}</figcaption>
 </figure>`;
 
       const h2Matches = [...article.content_html.matchAll(/<\/h2>/gi)];
