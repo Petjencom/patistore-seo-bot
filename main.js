@@ -52,6 +52,50 @@ function slugifyTurkish(text) {
     .replace(/-+/g, '-');
 }
 
+// Bulletproof HTML Balancer and Sanitizer (Prevents Layout Broken by Unclosed Tags)
+function sanitizeAndBalanceHtml(html) {
+  if (!html) return '';
+
+  let clean = html.trim();
+
+  // 1. Remove dangling unclosed tag at the very end (e.g., "<p", "<tr", "<td", "<table")
+  clean = clean.replace(/<[a-z0-9_-]+[^>]*$/i, '');
+
+  // 2. Self-closing tags that don't need closing
+  const selfClosing = new Set(['img', 'br', 'hr', 'input', 'meta', 'link']);
+
+  // 3. Stack-based tag balancing
+  const tagRegex = /<\/?([a-z0-9_-]+)(?:\s+[^>]*)?>/gi;
+  const openTags = [];
+  let match;
+
+  while ((match = tagRegex.exec(clean)) !== null) {
+    const fullTag = match[0];
+    const tagName = match[1].toLowerCase();
+    const isClosing = fullTag.startsWith('</');
+    const isSelfClose = fullTag.endsWith('/>') || selfClosing.has(tagName);
+
+    if (isSelfClose) continue;
+
+    if (isClosing) {
+      const lastIdx = openTags.lastIndexOf(tagName);
+      if (lastIdx !== -1) {
+        openTags.splice(lastIdx, openTags.length - lastIdx);
+      }
+    } else {
+      openTags.push(tagName);
+    }
+  }
+
+  // 4. Close any tags that were left open in reverse order
+  while (openTags.length > 0) {
+    const unclosed = openTags.pop();
+    clean += `</${unclosed}>`;
+  }
+
+  return clean;
+}
+
 // Load publication history
 function loadHistory() {
   try {
@@ -601,7 +645,10 @@ async function main() {
       }
     }
 
-    // 4. Publish directly to WordPress as 'publish'
+    // 4. Sanitize and balance all HTML tags to prevent broken layouts
+    article.content_html = sanitizeAndBalanceHtml(article.content_html);
+
+    // 5. Publish directly to WordPress as 'publish'
     console.log(`[*] WordPress'e Yayına Alınıyor (Status: publish)...`);
     const postPayload = {
       title: article.title,
