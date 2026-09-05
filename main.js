@@ -52,6 +52,34 @@ function slugifyTurkish(text) {
     .replace(/-+/g, '-');
 }
 
+// Strict Turkish Title Case Capitalizer
+function toTurkishTitleCase(str) {
+  if (!str) return '';
+  const lowercaseWords = new Set(['ve', 'veya', 'ile', 'de', 'da', 'mi', 'mı', 'mu', 'mü', 'için']);
+
+  return str
+    .split(' ')
+    .map((word, idx, arr) => {
+      if (!word) return '';
+      const cleanWord = word.trim();
+      const lower = cleanWord.toLocaleLowerCase('tr-TR');
+      const prevWord = idx > 0 ? arr[idx - 1] : '';
+      const isAfterColon = prevWord.endsWith(':');
+
+      if (idx > 0 && lowercaseWords.has(lower) && !isAfterColon) {
+        return lower;
+      }
+
+      const match = cleanWord.match(/^([^a-zA-ZçÇğĞıIİöÖşŞüÜ]*)(.*)$/);
+      if (match && match[2]) {
+        return match[1] + match[2].charAt(0).toLocaleUpperCase('tr-TR') + match[2].slice(1);
+      }
+
+      return cleanWord.charAt(0).toLocaleUpperCase('tr-TR') + cleanWord.slice(1);
+    })
+    .join(' ');
+}
+
 // Bulletproof HTML Balancer and Sanitizer (Prevents Layout Broken by Unclosed Tags)
 function sanitizeAndBalanceHtml(html) {
   if (!html) return '';
@@ -319,19 +347,19 @@ function generatePetPatternSvg(text, subtitle = '') {
 async function generateUltraHDImages(topic, articleTitle) {
   const focusKw = topic.focus_keyword;
   const baseSlug = slugifyTurkish(focusKw);
-  const cleanKw = focusKw.charAt(0).toUpperCase() + focusKw.slice(1);
-  const finalTitle = articleTitle || `${cleanKw}: 2026 Kapsamlı Uzman Rehberi`;
+  const cleanKw = toTurkishTitleCase(focusKw);
+  const finalTitle = toTurkishTitleCase(articleTitle || `${cleanKw}: 2026 Kapsamlı Uzman Rehberi`);
 
-  const inContentText = `${cleanKw} Rehberi ve Detaylar`;
-  const inContentSubtitle = "Klinik Analiz & Uzman Tavsiyeleri";
-  const inContentAlt = `${cleanKw} detaylı rehberi ve 2026 uzman tavsiyeleri`;
+  const inContentText = toTurkishTitleCase(`${cleanKw} Rehberi ve Detaylar`);
+  const inContentSubtitle = "Klinik Analiz ve Uzman Tavsiyeleri";
+  const inContentAlt = toTurkishTitleCase(`${cleanKw} Detaylı Rehberi ve 2026 Uzman Tavsiyeleri`);
   const inContentCaption = `${cleanKw} hakkında en çok merak edilenler ve uzman değerlendirmesi`;
 
   const configs = [
     {
-      mainText: focusKw,
+      mainText: cleanKw,
       subText: finalTitle,
-      alt: focusKw,
+      alt: cleanKw,
       caption: finalTitle,
       filename: `${baseSlug}-kapak-gorseli-patistore.jpg`
     },
@@ -388,7 +416,7 @@ function generateDiverseTitle(rawTitle, focusKw, mode) {
   // Banned repetitive phrases check
   const isBanned = /7\s*alt[ıi]n\s*kural|alt[ıi]n\s*kurallar?|7\s*kural|bilmeniz\s*gereken\s*7|7\s*ipucu|7\s*madde/i.test(title);
 
-  const cleanKw = focusKw.charAt(0).toUpperCase() + focusKw.slice(1);
+  const cleanKw = toTurkishTitleCase(focusKw);
 
   if (isBanned || title.length < 15 || !title.toLowerCase().includes(focusKw.toLowerCase())) {
     const localTemplates = [
@@ -423,7 +451,7 @@ function generateDiverseTitle(rawTitle, focusKw, mode) {
     title = chosenPool[randIdx];
   }
 
-  return title;
+  return toTurkishTitleCase(title);
 }
 
 // Generate 2500+ Words Content via gemini-3.6-flash
