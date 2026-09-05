@@ -1,0 +1,12 @@
+{
+  "name": "patistore-seo-bot",
+  "version": "1.0.0",
+  "description": "Patistore.net Autonomous 24/7 SEO Content Publisher with Sharp Image Typography Engine",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {
+    "sharp": "^0.33.5"
+  }
+}
