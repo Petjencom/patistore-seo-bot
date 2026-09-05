@@ -539,85 +539,119 @@ Hemen ardından makale HTML içeriğini (özet, <h2>, <h3>, <p>, <table>, <ul>, 
   };
 }
 
-// Master Task Selector (1 Local Service -> 1 Popular Breed -> 1 Pet Care/Cost)
-function selectNextTask(history) {
+// Master Task Selector (1 Local Service -> 1 Popular Breed -> 1 Pet Care/Cost) with Live Duplicate Prevention
+async function selectNextTask(history) {
   const lastMode = history.last_mode || "cost_care";
-  let nextMode = "local_service";
-  if (lastMode === "local_service") nextMode = "breed";
-  else if (lastMode === "breed") nextMode = "cost_care";
-  else nextMode = "local_service";
+  let modesToTry = ["local_service", "breed", "cost_care"];
+  if (lastMode === "local_service") modesToTry = ["breed", "cost_care", "local_service"];
+  else if (lastMode === "breed") modesToTry = ["cost_care", "local_service", "breed"];
 
-  const publishedSet = new Set(history.published_slugs || []);
+  // 1. Fetch live WordPress slugs to prevent ANY duplicate publishing
+  const livePublishedSlugs = new Set(history.published_slugs || []);
+  try {
+    const res = await fetch(`${WP_URL}/wp-json/wp/v2/posts?per_page=100&_fields=slug,title`, {
+      headers: { 'Authorization': AUTH_HEADER }
+    });
+    if (res.ok) {
+      const livePosts = await res.json();
+      for (const p of livePosts) {
+        if (p.slug) {
+          livePublishedSlugs.add(p.slug.toLowerCase());
+          livePublishedSlugs.add(p.slug.replace(/-\d+$/, '').toLowerCase());
+        }
+        if (p.title && p.title.rendered) {
+          livePublishedSlugs.add(slugifyTurkish(p.title.rendered));
+        }
+      }
+    }
+  } catch (e) {
+    console.error('[-] Canlı yazı listesi çekilemedi:', e.message);
+  }
 
-  if (nextMode === "local_service") {
-    const rawCities = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'cities_districts.json'), 'utf8'));
-    const rawServices = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'services.json'), 'utf8'));
-    const citiesDistricts = Array.isArray(rawCities) ? rawCities : (rawCities.cities_districts || rawCities.districts || []);
-    const services = Array.isArray(rawServices) ? rawServices : (rawServices.services || []);
+  const rawCities = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'cities_districts.json'), 'utf8'));
+  const rawServices = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'services.json'), 'utf8'));
+  const rawBreeds = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'popular_breeds.json'), 'utf8'));
+  const rawTopics = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'hit_topics.json'), 'utf8'));
 
-    for (const item of citiesDistricts) {
-      for (const srv of services) {
-        const slug = slugifyTurkish(`${item.district}-${item.city}-${srv.name}`);
-        if (!publishedSet.has(slug)) {
+  const citiesDistricts = Array.isArray(rawCities) ? rawCities : (rawCities.cities_districts || rawCities.districts || []);
+  const services = Array.isArray(rawServices) ? rawServices : (rawServices.services || []);
+  const breeds = Array.isArray(rawBreeds) ? rawBreeds : (rawBreeds.topics || rawBreeds.breeds || []);
+  const hitTopics = Array.isArray(rawTopics) ? rawTopics : (rawTopics.topics || []);
+
+  for (const nextMode of modesToTry) {
+    if (nextMode === "local_service") {
+      for (const item of citiesDistricts) {
+        for (const srv of services) {
+          const slug = slugifyTurkish(`${item.district}-${item.city}-${srv.name}`);
+          const altSlug = slugifyTurkish(`${item.district}-${srv.name}`);
+          if (!livePublishedSlugs.has(slug) && !livePublishedSlugs.has(altSlug)) {
+            return {
+              mode: "local_service",
+              title: `${item.district} ${srv.name} (${item.city})`,
+              focus_keyword: `${item.district} ${srv.name.toLowerCase()}`,
+              category: srv.category,
+              slug: slug
+            };
+          }
+        }
+      }
+    } else if (nextMode === "breed") {
+      for (const b of breeds) {
+        const bTitle = b.title || b.name;
+        const bKw = b.focus_keyword || `${b.name} bakımı`;
+        const slug = slugifyTurkish(bTitle);
+        const kwSlug = slugifyTurkish(bKw);
+        if (!livePublishedSlugs.has(slug) && !livePublishedSlugs.has(kwSlug)) {
           return {
-            mode: "local_service",
-            title: `${item.district} ${srv.name} (${item.city})`,
-            focus_keyword: `${item.district} ${srv.name.toLowerCase()}`,
-            category: srv.category,
+            mode: "breed",
+            title: bTitle,
+            focus_keyword: bKw.toLowerCase(),
+            category: b.category,
+            slug: slug
+          };
+        }
+      }
+    } else if (nextMode === "cost_care") {
+      for (const t of hitTopics) {
+        const slug = slugifyTurkish(t.title);
+        const kwSlug = slugifyTurkish(t.focus_keyword);
+        if (!livePublishedSlugs.has(slug) && !livePublishedSlugs.has(kwSlug)) {
+          return {
+            mode: "cost_care",
+            title: t.title,
+            focus_keyword: t.focus_keyword.toLowerCase(),
+            category: t.category,
             slug: slug
           };
         }
       }
     }
-  } else if (nextMode === "breed") {
-    const rawBreeds = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'popular_breeds.json'), 'utf8'));
-    const breeds = Array.isArray(rawBreeds) ? rawBreeds : (rawBreeds.topics || rawBreeds.breeds || []);
-    for (const b of breeds) {
-      const bTitle = b.title || b.name;
-      const bKw = b.focus_keyword || `${b.name} bakımı`;
-      const slug = slugifyTurkish(bTitle);
-      if (!publishedSet.has(slug)) {
+  }
+
+  // Exhaustive search over all districts if all modes covered
+  for (const item of citiesDistricts) {
+    for (const srv of services) {
+      const slug = slugifyTurkish(`${item.district}-${item.city}-${srv.name}`);
+      if (!livePublishedSlugs.has(slug)) {
         return {
-          mode: "breed",
-          title: bTitle,
-          focus_keyword: bKw.toLowerCase(),
-          category: b.category,
-          slug: slug
-        };
-      }
-    }
-  } else {
-    const rawTopics = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'hit_topics.json'), 'utf8'));
-    const hitTopics = Array.isArray(rawTopics) ? rawTopics : (rawTopics.topics || []);
-    for (const t of hitTopics) {
-      const slug = slugifyTurkish(t.title);
-      if (!publishedSet.has(slug)) {
-        return {
-          mode: "cost_care",
-          title: t.title,
-          focus_keyword: t.focus_keyword.toLowerCase(),
-          category: t.category,
+          mode: "local_service",
+          title: `${item.district} ${srv.name} (${item.city})`,
+          focus_keyword: `${item.district} ${srv.name.toLowerCase()}`,
+          category: srv.category,
           slug: slug
         };
       }
     }
   }
 
-  // Fallback if all covered
-  return {
-    mode: "cost_care",
-    title: `2026 Kedi ve Köpek Sağlık Bakım Rehberi`,
-    focus_keyword: `evcil hayvan bakımı`,
-    category: `Pet Bakım`,
-    slug: `evcil-hayvan-bakimi-${Date.now()}`
-  };
+  throw new Error("Tüm 81 il, ilçeler ve ırk konuları yayınlanmış. Yeni konu ekleyiniz.");
 }
 
 // Master Execution Flow
 async function main() {
   console.log('=== Patistore.net 24/7 Otonom SEO & Sharp Görsel Yayın Motoru Başlatıldı ===');
   const history = loadHistory();
-  const task = selectNextTask(history);
+  const task = await selectNextTask(history);
   console.log(`[+] Seçilen Görev Modu: [${task.mode.toUpperCase()}]`);
   console.log(`[+] Başlık: ${task.title}`);
   console.log(`[+] Odak Anahtar Kelime: ${task.focus_keyword}`);
