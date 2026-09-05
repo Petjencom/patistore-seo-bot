@@ -236,79 +236,86 @@ function wrapBannerText(text, maxCharsPerLine = 22) {
   return lines;
 }
 
-// Predefined vibrant aesthetic mesh gradient color palettes
-const COLOR_PALETTES = [
-  {
-    bg: '#ec4899',
-    c1: '#f43f5e', c2: '#8b5cf6', c3: '#3b82f6', c4: '#06b6d4', c5: '#fbbf24', c6: '#d946ef'
-  },
-  {
-    bg: '#6366f1',
-    c1: '#3b82f6', c2: '#ec4899', c3: '#f97316', c4: '#10b981', c5: '#a855f7', c6: '#e11d48'
-  },
-  {
-    bg: '#0ea5e9',
-    c1: '#06b6d4', c2: '#3b82f6', c3: '#a855f7', c4: '#f43f5e', c5: '#fbbf24', c6: '#10b981'
-  },
-  {
-    bg: '#f97316',
-    c1: '#ef4444', c2: '#f59e0b', c3: '#ec4899', c4: '#8b5cf6', c5: '#06b6d4', c6: '#10b981'
-  },
-  {
-    bg: '#8b5cf6',
-    c1: '#d946ef', c2: '#ec4899', c3: '#3b82f6', c4: '#06b6d4', c5: '#facc15', c6: '#f43f5e'
-  }
-];
-
-function generateVibrantMeshSvg(text, paletteIndex = 0) {
-  const palette = COLOR_PALETTES[paletteIndex % COLOR_PALETTES.length];
+// Generate Pet Pattern Icons SVG with High-Contrast Centered Frosted Card
+function generatePetPatternSvg(text, subtitle = '') {
   const upperText = (text || '').toLocaleUpperCase('tr-TR');
   const lines = wrapBannerText(upperText, 20);
 
-  let fontSize = 64;
-  if (lines.length > 2) fontSize = 52;
-  if (lines.length > 3) fontSize = 42;
+  let fontSize = 56;
+  if (lines.length > 2) fontSize = 46;
+  if (lines.length > 3) fontSize = 38;
 
   const lineHeight = fontSize * 1.25;
   const totalHeight = lines.length * lineHeight;
-  const startY = (675 - totalHeight) / 2 + (fontSize * 0.9);
+  const startY = (675 - totalHeight) / 2 + (fontSize * 0.85);
 
   const textSvgLines = lines.map((line, idx) => {
     const yPos = startY + (idx * lineHeight);
-    return `<text x="600" y="${yPos}" text-anchor="middle" font-family="'Cinzel', 'Playfair Display', 'Times New Roman', 'Georgia', serif" font-size="${fontSize}" font-weight="700" fill="#ffffff" filter="url(#shadow)" letter-spacing="2">${escapeXml(line)}</text>`;
+    return `<text x="600" y="${yPos}" text-anchor="middle" font-family="'Montserrat', 'Arial Black', sans-serif" font-size="${fontSize}" font-weight="900" fill="#0f172a" letter-spacing="1.5">${escapeXml(line)}</text>`;
   }).join('\n');
+
+  const subtitleSvg = subtitle
+    ? `<text x="600" y="${startY + (lines.length * lineHeight) + 25}" text-anchor="middle" font-family="'Inter', sans-serif" font-size="20" font-weight="600" fill="#64748b" letter-spacing="1">${escapeXml(subtitle)}</text>`
+    : '';
+
+  const cardWidth = 960;
+  const cardHeight = Math.max(280, totalHeight + 140);
+  const cardX = (1200 - cardWidth) / 2;
+  const cardY = (675 - cardHeight) / 2;
 
   return `
   <svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
-        <feGaussianBlur stdDeviation="95" result="blur" />
+      <pattern id="petDoodle" width="200" height="200" patternUnits="userSpaceOnUse">
+        <circle cx="40" cy="40" r="10" fill="none" stroke="#f43f5e" stroke-width="3.5" />
+        <circle cx="28" cy="24" r="4.5" fill="none" stroke="#f43f5e" stroke-width="3" />
+        <circle cx="40" cy="18" r="4.5" fill="none" stroke="#f43f5e" stroke-width="3" />
+        <circle cx="52" cy="24" r="4.5" fill="none" stroke="#f43f5e" stroke-width="3" />
+
+        <path d="M 125,40 L 155,40 M 125,35 A 5,5 0 0,0 120,40 A 5,5 0 0,0 125,45 M 155,35 A 5,5 0 0,1 160,40 A 5,5 0 0,1 155,45" fill="none" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round" />
+
+        <path d="M 40,130 L 60,110 L 80,130 L 80,165 L 40,165 Z M 52,165 L 52,145 A 8,8 0 0,1 68,145 L 68,165" fill="none" stroke="#10b981" stroke-width="3.5" stroke-linejoin="round" />
+
+        <circle cx="150" cy="140" r="22" fill="none" stroke="#f59e0b" stroke-width="3.5" />
+        <path d="M 140,140 Q 150,130 160,140 Q 150,150 140,140 Z M 135,135 L 140,140 L 135,145 Z" fill="none" stroke="#f59e0b" stroke-width="3" />
+
+        <path d="M 95,85 L 125,85 L 120,105 L 100,105 Z" fill="none" stroke="#8b5cf6" stroke-width="3.5" stroke-linejoin="round" />
+
+        <path d="M 180,85 A 6,6 0 0,0 170,85 Q 170,95 180,102 Q 190,95 190,85 A 6,6 0 0,0 180,85 Z" fill="none" stroke="#ec4899" stroke-width="3" />
+      </pattern>
+
+      <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="rgba(15,23,42,0.18)" />
+        <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(15,23,42,0.08)" />
       </filter>
-      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="rgba(0,0,0,0.3)" />
-      </filter>
+
+      <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.96" />
+        <stop offset="100%" stop-color="#f8fafc" stop-opacity="0.94" />
+      </linearGradient>
+
+      <linearGradient id="badgeGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#ff6b00" />
+        <stop offset="100%" stop-color="#ff8800" />
+      </linearGradient>
     </defs>
 
-    <!-- Background Base -->
-    <rect width="1200" height="675" fill="${palette.bg}" />
+    <rect width="1200" height="675" fill="#fcfdfe" />
+    <rect width="1200" height="675" fill="url(#petDoodle)" opacity="0.85" />
+    <rect x="${cardX}" y="${cardY}" width="${cardWidth}" height="${cardHeight}" rx="24" fill="url(#cardGrad)" stroke="#e2e8f0" stroke-width="2.5" filter="url(#cardShadow)" />
 
-    <!-- Vibrant Blurred Color Blobs for Authentic Mesh Gradient -->
-    <g filter="url(#blur)">
-      <circle cx="200" cy="180" r="280" fill="${palette.c1}" opacity="0.9" />
-      <circle cx="950" cy="160" r="320" fill="${palette.c2}" opacity="0.85" />
-      <circle cx="600" cy="120" r="260" fill="${palette.c3}" opacity="0.85" />
-      <circle cx="150" cy="520" r="300" fill="${palette.c4}" opacity="0.85" />
-      <circle cx="980" cy="520" r="320" fill="${palette.c5}" opacity="0.9" />
-      <circle cx="550" cy="550" r="290" fill="${palette.c6}" opacity="0.85" />
+    <g transform="translate(${cardX + (cardWidth - 280) / 2}, ${cardY - 20})">
+      <rect width="280" height="40" rx="20" fill="url(#badgeGrad)" />
+      <text x="140" y="25" text-anchor="middle" font-family="'Montserrat', sans-serif" font-size="13" font-weight="800" fill="#ffffff" letter-spacing="2">🐾 PATISTORE REHBERİ</text>
     </g>
 
-    <!-- Centered High-End Typography -->
     ${textSvgLines}
+    ${subtitleSvg}
   </svg>
   `;
 }
 
-// Generate Exactly 2 Ultra-HD Images (1 Featured Cover + 1 In-Content, 1200x675) with Vibrant Mesh Gradient
+// Generate Exactly 2 Ultra-HD Images (1 Featured Cover + 1 In-Content, 1200x675) with Pet Pattern
 async function generateUltraHDImages(topic, articleTitle) {
   const focusKw = topic.focus_keyword;
   const baseSlug = slugifyTurkish(focusKw);
@@ -316,20 +323,21 @@ async function generateUltraHDImages(topic, articleTitle) {
   const finalTitle = articleTitle || `${cleanKw}: 2026 Kapsamlı Uzman Rehberi`;
 
   const inContentText = `${cleanKw} Rehberi ve Detaylar`;
+  const inContentSubtitle = "Klinik Analiz & Uzman Tavsiyeleri";
   const inContentAlt = `${cleanKw} detaylı rehberi ve 2026 uzman tavsiyeleri`;
   const inContentCaption = `${cleanKw} hakkında en çok merak edilenler ve uzman değerlendirmesi`;
 
   const configs = [
     {
-      bannerText: focusKw,
-      paletteIdx: 0,
+      mainText: focusKw,
+      subText: finalTitle,
       alt: focusKw,
       caption: finalTitle,
       filename: `${baseSlug}-kapak-gorseli-patistore.jpg`
     },
     {
-      bannerText: inContentText,
-      paletteIdx: 1,
+      mainText: inContentText,
+      subText: inContentSubtitle,
       alt: inContentAlt,
       caption: inContentCaption,
       filename: `${baseSlug}-detay-rehberi-patistore.jpg`
@@ -340,10 +348,10 @@ async function generateUltraHDImages(topic, articleTitle) {
 
   for (let idx = 0; idx < configs.length; idx++) {
     const cfg = configs[idx];
-    console.log(`    [*] 16:9 Canlı Mesh Gradient Görsel ${idx + 1}/2 Üretiliyor (Yazı: "${cfg.bannerText}")`);
+    console.log(`    [*] 16:9 Sevimli Pati Desenli Görsel ${idx + 1}/2 Üretiliyor (Yazı: "${cfg.mainText}")`);
 
     try {
-      const svgString = generateVibrantMeshSvg(cfg.bannerText, cfg.paletteIdx);
+      const svgString = generatePetPatternSvg(cfg.mainText, cfg.subText);
       const svgBuffer = Buffer.from(svgString);
 
       let jpgBuffer;
@@ -621,7 +629,10 @@ async function main() {
 
     // 1. Generate 2500+ Words Content
     const article = await generateBulletproofArticle(task, recentPosts);
-    console.log(`[+] 2500+ Kelimelik İçerik Başarıyla Üretildi! Başlık: "${article.title}"`);
+    if (!article.content_html || article.content_html.trim().length < 2000) {
+      throw new Error(`[CRITICAL] İçerik üretilemedi veya çok kısa (${article.content_html ? article.content_html.length : 0} karakter)! Boş yayın engellendi.`);
+    }
+    console.log(`[+] 2500+ Kelimelik İçerik Başarıyla Üretildi (${article.content_html.length} karakter)! Başlık: "${article.title}"`);
 
     // 2. Generate Exactly 2 1200x675 HD Images with Sharp Typography Burnt-in
     const images = await generateUltraHDImages(task, article.title);
