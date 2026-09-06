@@ -52,7 +52,7 @@ function slugifyTurkish(text) {
     .replace(/-+/g, '-');
 }
 
-// Strict Turkish Title Case Capitalizer
+// Strict Turkish Title Case Capitalizer (TDK Uyumlu Büyük Harf Motoru)
 function toTurkishTitleCase(str) {
   if (!str) return '';
   const lowercaseWords = new Set(['ve', 'veya', 'ile', 'de', 'da', 'mi', 'mı', 'mu', 'mü', 'için']);
@@ -80,16 +80,16 @@ function toTurkishTitleCase(str) {
     .join(' ');
 }
 
-// Bulletproof HTML Balancer and Sanitizer (Prevents Layout Broken by Unclosed Tags)
+// Bulletproof HTML Balancer and Sanitizer (Prevents Broken Layouts)
 function sanitizeAndBalanceHtml(html) {
   if (!html) return '';
 
   let clean = html.trim();
 
-  // 1. Remove dangling unclosed tag at the very end (e.g., "<p", "<tr", "<td", "<table")
+  // 1. Remove dangling unclosed tag at the very end
   clean = clean.replace(/<[a-z0-9_-]+[^>]*$/i, '');
 
-  // 2. Self-closing tags that don't need closing
+  // 2. Self-closing tags
   const selfClosing = new Set(['img', 'br', 'hr', 'input', 'meta', 'link']);
 
   // 3. Stack-based tag balancing
@@ -115,13 +115,44 @@ function sanitizeAndBalanceHtml(html) {
     }
   }
 
-  // 4. Close any tags that were left open in reverse order
+  // 4. Close any tags that were left open
   while (openTags.length > 0) {
     const unclosed = openTags.pop();
     clean += `</${unclosed}>`;
   }
 
   return clean;
+}
+
+// Capitalize all H2, H3, H4 headings in HTML with proper Turkish Title Case
+function capitalizeHtmlHeadings(html) {
+  return html.replace(/<(h[234])([^>]*)>(.*?)<\/\1>/gi, (match, tag, attrs, content) => {
+    if (content.includes('<span') || content.includes('<a')) {
+      return match;
+    }
+    return `<${tag}${attrs}>${toTurkishTitleCase(content)}</${tag}>`;
+  });
+}
+
+// Aggressive prompt leak & meta-chatter cleaner
+function cleanArticleHtml(raw) {
+  if (!raw) return '';
+  let clean = raw.trim();
+
+  // Strip markdown code fences
+  clean = clean.replace(/^```html\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '');
+
+  // Strip title and meta desc comments
+  clean = clean.replace(/<!--\s*TITLE:.*?-->/gi, '');
+  clean = clean.replace(/<!--\s*META_DESC:.*?-->/gi, '');
+
+  // Strip AI conversational preambles
+  clean = clean.replace(/^(İşte|Tabii ki|Harika|Aşağıda|Merhaba|Veteriner hekim olarak|Hazırladığım|Bu makalede|Uzman rehberi)[^<]*/gi, '');
+
+  // Strip trailing meta notes
+  clean = clean.replace(/<p[^>]*>\s*(Not|Önemli Not|Yazar Notu|Kaynaklar|Hazırlayan|Umarım):.*?(<\/p>|$)/gi, '');
+
+  return clean.trim();
 }
 
 // Load publication history
@@ -166,12 +197,13 @@ async function fetchRecentPosts() {
 // Get or create category
 async function getOrCreateCategory(categoryName) {
   try {
-    const searchRes = await fetch(`${WP_URL}/wp-json/wp/v2/categories?search=${encodeURIComponent(categoryName)}`, {
+    const cleanName = toTurkishTitleCase(categoryName);
+    const searchRes = await fetch(`${WP_URL}/wp-json/wp/v2/categories?search=${encodeURIComponent(cleanName)}`, {
       headers: { 'Authorization': AUTH_HEADER }
     });
     if (searchRes.ok) {
       const cats = await searchRes.json();
-      const existing = cats.find(c => c.name.toLowerCase() === categoryName.toLowerCase());
+      const existing = cats.find(c => c.name.toLowerCase() === cleanName.toLowerCase());
       if (existing) return existing.id;
     }
 
@@ -181,17 +213,49 @@ async function getOrCreateCategory(categoryName) {
         'Authorization': AUTH_HEADER,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name: categoryName })
+      body: JSON.stringify({ name: cleanName })
     });
     if (createRes.ok) {
       const newCat = await createRes.json();
-      console.log(`[+] Yeni Kategori Açıldı: ${categoryName} (ID: ${newCat.id})`);
+      console.log(`[+] Yeni Kategori Açıldı: ${cleanName} (ID: ${newCat.id})`);
       return newCat.id;
     }
   } catch (e) {
     console.error(`[-] Kategori oluşturulamadı (${categoryName}):`, e.message);
   }
   return 1;
+}
+
+// Get or create tag with Turkish Title Case
+async function getOrCreateTag(tagName) {
+  const cleanName = toTurkishTitleCase(tagName.trim());
+  const slug = slugifyTurkish(cleanName);
+  try {
+    const searchRes = await fetch(`${WP_URL}/wp-json/wp/v2/tags?search=${encodeURIComponent(cleanName)}`, {
+      headers: { 'Authorization': AUTH_HEADER }
+    });
+    if (searchRes.ok) {
+      const existing = await searchRes.json();
+      const match = existing.find(t => t.slug === slug || t.name.toLowerCase() === cleanName.toLowerCase());
+      if (match) return match.id;
+    }
+
+    const createRes = await fetch(`${WP_URL}/wp-json/wp/v2/tags`, {
+      method: 'POST',
+      headers: {
+        'Authorization': AUTH_HEADER,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name: cleanName, slug })
+    });
+    if (createRes.ok) {
+      const created = await createRes.json();
+      return created.id;
+    }
+  } catch (e) {
+    console.error(`[-] Tag [${cleanName}] hatası:`, e.message);
+  }
+  return null;
 }
 
 // Upload Media to WordPress
@@ -221,7 +285,7 @@ async function uploadImage(imageBuffer, filename, altText, caption) {
           description: altText
         })
       });
-      console.log(`[+] Başlık Yazılı 16:9 HD Görsel Yüklendi: ${filename} (ID: ${media.id}) - Alt: '${altText}'`);
+      console.log(`[+] 16:9 HD Görsel Yüklendi: ${filename} (ID: ${media.id}) - Alt: '${altText}'`);
       return { id: media.id, source_url: media.source_url || media.guid?.rendered };
     } else {
       console.error('[-] Media Upload Error:', await uploadRes.text());
@@ -232,7 +296,6 @@ async function uploadImage(imageBuffer, filename, altText, caption) {
   return null;
 }
 
-// Helper to escape XML special characters
 // Helper to escape XML
 function escapeXml(unsafe) {
   return (unsafe || '').replace(/[<>&'"]/g, (c) => {
@@ -454,7 +517,7 @@ function generateDiverseTitle(rawTitle, focusKw, mode) {
   return toTurkishTitleCase(title);
 }
 
-// Generate 2500+ Words Content via gemini-3.6-flash
+// Generate 1500-1800 Words Bulletproof Content (Never Cut Off, Full Structure)
 async function generateBulletproofArticle(task, recentPosts) {
   const linksContext = recentPosts && recentPosts.length > 0
     ? recentPosts.slice(0, 8).map(p => `- <a href="${p.link}">${p.title}</a>`).join('\n')
@@ -462,22 +525,21 @@ async function generateBulletproofArticle(task, recentPosts) {
 
   const prompt = `
 SEN DÜNYACA ÜNLÜ 25 YILLIK KIDEMLİ VETERİNER HEKİM, AKADEMİSYEN VE SEO OTORİTESİSİN.
-Aşağıdaki konu hakkında Türkçe, E-E-A-T ve YMYL standartlarında, TAM 2500+ KELİME UZUNLUĞUNDA, RankMath 100/100 tam uyumlu derinlemesine uzman makalesi yaz.
+Aşağıdaki konu hakkında Türkçe, E-E-A-T ve YMYL standartlarında, TAM 1500-1800 KELİME UZUNLUĞUNDA, RankMath 100/100 tam uyumlu eksiksiz uzman makalesi yaz.
 
 KONU BİLGİLERİ:
 - Odak Anahtar Kelime: "${task.focus_keyword}"
 - Kategori: "${task.category || 'Genel'}"
-- Tür/Bölge: "${task.title}"
+- Konu/Bölge: "${task.title}"
 
-YAZIM VE KALİTE KURALLARI (KESİNLİKLE UYULACAK):
-1. UZUNLUK: Makale minimum 2500 kelime olacaktır. Her ana başlık altında en az 4-5 doyurucu alt başlık ve her paragrafta detaylı klinik/akademik açıklamalar yer alacaktır.
-2. BAŞLIK FORMATI (ÇOK ÖNEMLİ): Başlıkta KESİNLİKLE "7 Altın Kural", "7 Kural", "7 İpucu", "7 Madde" gibi klişe veya kendini tekrar eden kalıplar KULLANILMAYACAKTIR! Başlık doğrudan odak anahtar kelimeyi içeren, özgün, merak uyandıran ve 2026 güncel rehber formatında olmalıdır.
-3. DİL VE AKICILIK: Cümleler ortalama 15 kelimeden kısa, edilgen çatı (passive voice) %7'nin altında, geçiş kelimeleri (transition words: "özellikle", "bu nedenle", "buna ek olarak", "örneğin", "sonuç olarak") %65'in üzerinde olmalıdır. Mikro paragraflar (2-4 cümle) kullanılmalıdır.
-4. BİLİMSEL REFERANSLAR: Metin içinde en az 5 saygın otoriteye doğrudan atıf yapılacaktır (Örn: WSAVA Global Nutrition Guidelines, AVMA, Cornell Feline Health Center, TVHB - Türk Veteriner Hekimleri Birliği, Dr. Karen Becker).
-5. KARŞILAŞTIRMA TABLOLARI: Metin içinde en az 2 adet detaylı HTML tablosu (<table><thead>...<tbody>...) bulunacaktır (Örn: Yaş gruplarına göre besin/ihtiyaç tablosu, Maliyet ve bütçe planlama tablosu, Belirtiler ve müdahale tablosu).
-6. SSS (FAQ) VE SCHEMA.ORG: Makale sonunda en az 7 adet detaylı SSS (Sıkça Sorulan Sorular) ve hemen ardından eksiksiz Schema.org "FAQPage" JSON-LD script bloğu yer alacaktır.
-7. SEMANTİK VE 200 KELİMELİK ÖZET: Makalenin en başında 200 kelimelik, odak anahtar kelimeyi ve 20 semantik LSI kelimeyi bold (<strong>) olarak içeren güçlü bir klinik özet bölümü olacaktır.
-8. İÇ LİNKLEME: Aşağıdaki linklerden en az 3 tanesini metin içinde doğal bağlamda <a href="..."></a> olarak geçir:
+YAZIM VE KALİTE KURALLARI (KESİNLİKLE VE İSTİSNASIZ UYULACAK):
+1. EKSİKSİZLİK: Makale ASLA yarım, kesik veya eksik bırakılmayacaktır. Giriş özeti, en az 5 doyurucu ana başlık (H2), her ana başlık altında 2-3 detaylı alt başlık (H3), en az 2 adet detaylı HTML tablosu (<table><thead>...<tbody>...), adım adım bakım/klinik protokolü, en az 5 adet SSS (Sıkça Sorulan Sorular), klinik uzman değerlendirmesi ve Schema.org "FAQPage" JSON-LD script bloğu ile EKSİKSİZ sonlandırılacaktır.
+2. BAŞLIK FORMATI: Başlıkta KESİNLİKLE "7 Altın Kural", "7 Kural", "7 İpucu", "7 Madde" gibi klişe veya birbirini tekrar eden kalıplar KULLANILMAYACAKTIR! Başlık doğrudan odak anahtar kelimeyi içeren, özgün, merak uyandıran ve 2026 güncel rehber formatında olmalıdır.
+3. İMLA VE TÜRKÇE KURALLARI: Türk Dil Kurumu (TDK) imla ve yazım kurallarına %100 uyulacak; de/da bağlacı, ki eki, mı/mi soru eki yazımlarında asla hata yapılmayacaktır. Tüm H2 ve H3 başlıklarının her kelimesi büyük harfle (Title Case) başlayacaktır.
+4. PROMPT VE META TEMİZLİĞİ: Metin öncesinde veya sonrasında asla "İşte hazırladığım makale", "Veteriner hekim olarak...", "Umarım faydalı olur" gibi yapay zeka meta konuşmaları veya markdown kod blokları yer almayacaktır. Doğrudan HTML etiketleri ile başlanacaktır.
+5. KARŞILAŞTIRMA TABLOLARI: Metin içinde en az 2 adet detaylı HTML tablosu (<table><thead>...<tbody>...) bulunacaktır.
+6. BİLİMSEL ATIFLAR: Metin içinde saygın otoritelere doğrudan atıf yapılacaktır (WSAVA, AVMA, TVHB).
+7. İÇ LİNKLEME: Aşağıdaki linklerden en az 2 tanesini metin içinde doğal bağlamda <a href="..."></a> olarak geçir:
 ${linksContext}
 
 ÇIKTI FORMATI:
@@ -495,7 +557,7 @@ Hemen ardından makale HTML içeriğini (özet, <h2>, <h3>, <p>, <table>, <ul>, 
     let attempts = 0;
     while (attempts < 3) {
       attempts++;
-      console.log(`    [*] Model [${modelName}] ile 2500+ kelimelik HTML içerik üretiliyor (Deneme ${attempts}/3)...`);
+      console.log(`    [*] Model [${modelName}] ile içerik üretiliyor (Deneme ${attempts}/3)...`);
 
       try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`, {
@@ -523,25 +585,31 @@ Hemen ardından makale HTML içeriğini (özet, <h2>, <h3>, <p>, <table>, <ul>, 
         }
 
         const data = await response.json();
-        rawOutput = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        if (rawOutput && rawOutput.trim().length > 500) {
-          console.log(`    [+] İçerik başarıyla üretildi (${rawOutput.length} karakter)!`);
+        const cand = data.candidates?.[0];
+        const finishReason = cand?.finishReason;
+        const generatedText = cand?.content?.parts?.[0]?.text || '';
+
+        console.log(`    [+] Model yanıtı alındı (${generatedText.length} karakter, Bitiş Kodu: ${finishReason})`);
+
+        if (finishReason === 'STOP' && generatedText.trim().length > 6000) {
+          rawOutput = generatedText;
           break;
+        } else if (finishReason === 'MAX_TOKENS') {
+          console.log(`    [!] Çıktı token limitine takıldı, yeniden deneniyor...`);
         }
       } catch (e) {
         console.error(`    [-] Bağlantı hatası [${modelName}]:`, e.message);
       }
     }
-    if (rawOutput && rawOutput.trim().length > 500) break;
+    if (rawOutput && rawOutput.trim().length > 6000) break;
   }
 
-  if (!rawOutput || rawOutput.trim().length < 500) {
-    throw new Error('Gemini boş veya çok kısa içerik döndürdü.');
+  if (!rawOutput || rawOutput.trim().length < 6000) {
+    throw new Error('Gemini boş veya eksik içerik döndürdü. Güvenlik kilidi devreye girdi.');
   }
 
   let extractedTitle = '';
   let extractedMeta = '';
-  let contentHtml = rawOutput;
 
   const titleMatch = rawOutput.match(/<!--\s*TITLE:\s*(.*?)\s*-->/i);
   if (titleMatch) extractedTitle = titleMatch[1].trim();
@@ -549,13 +617,8 @@ Hemen ardından makale HTML içeriğini (özet, <h2>, <h3>, <p>, <table>, <ul>, 
   const metaMatch = rawOutput.match(/<!--\s*META_DESC:\s*(.*?)\s*-->/i);
   if (metaMatch) extractedMeta = metaMatch[1].trim();
 
-  contentHtml = contentHtml
-    .replace(/<!--\s*TITLE:.*?-->/gi, '')
-    .replace(/<!--\s*META_DESC:.*?-->/gi, '')
-    .replace(/^```html\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/\s*```$/i, '')
-    .trim();
+  let contentHtml = cleanArticleHtml(rawOutput);
+  contentHtml = capitalizeHtmlHeadings(contentHtml);
 
   const finalTitle = generateDiverseTitle(extractedTitle || task.title, task.focus_keyword, task.mode);
   const finalMeta = extractedMeta || `${task.focus_keyword} hakkında 2026 güncel veteriner hekim tavsiyeleri, klinik rehber ve bakım ipuçları.`;
@@ -567,7 +630,7 @@ Hemen ardından makale HTML içeriğini (özet, <h2>, <h3>, <p>, <table>, <ul>, 
   };
 }
 
-// Master Task Selector (1 Local Service -> 1 Popular Breed -> 1 Pet Care/Cost) with Live Duplicate Prevention
+// Master Task Selector with Live Duplicate Prevention and Tag Generation
 async function selectNextTask(history) {
   const lastMode = history.last_mode || "cost_care";
   let modesToTry = ["local_service", "breed", "cost_care"];
@@ -601,7 +664,19 @@ async function selectNextTask(history) {
   const rawBreeds = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'popular_breeds.json'), 'utf8'));
   const rawTopics = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'hit_topics.json'), 'utf8'));
 
-  const citiesDistricts = Array.isArray(rawCities) ? rawCities : (rawCities.cities_districts || rawCities.districts || []);
+  const citiesDistricts = [];
+  if (rawCities.cities && Array.isArray(rawCities.cities)) {
+    for (const c of rawCities.cities) {
+      const cityName = c.name || c.city || '';
+      if (c.districts && Array.isArray(c.districts)) {
+        for (const d of c.districts) {
+          citiesDistricts.push({ city: cityName, district: d });
+        }
+      }
+    }
+  } else if (Array.isArray(rawCities)) {
+    citiesDistricts.push(...rawCities);
+  }
   const services = Array.isArray(rawServices) ? rawServices : (rawServices.services || []);
   const breeds = Array.isArray(rawBreeds) ? rawBreeds : (rawBreeds.topics || rawBreeds.breeds || []);
   const hitTopics = Array.isArray(rawTopics) ? rawTopics : (rawTopics.topics || []);
@@ -618,7 +693,14 @@ async function selectNextTask(history) {
               title: `${item.district} ${srv.name} (${item.city})`,
               focus_keyword: `${item.district} ${srv.name.toLowerCase()}`,
               category: srv.category,
-              slug: slug
+              slug: slug,
+              tags: [
+                `${item.district} Veteriner`,
+                srv.name,
+                `${item.city} Pet`,
+                'Evcil Hayvan Bakımı',
+                'Veteriner Tavsiyesi'
+              ]
             };
           }
         }
@@ -635,7 +717,14 @@ async function selectNextTask(history) {
             title: bTitle,
             focus_keyword: bKw.toLowerCase(),
             category: b.category,
-            slug: slug
+            slug: slug,
+            tags: [
+              bTitle,
+              `${bTitle} Bakımı`,
+              b.category || 'Evcil Hayvan Irkları',
+              'Evcil Hayvan Sağlığı',
+              'Veteriner Tavsiyesi'
+            ]
           };
         }
       }
@@ -649,14 +738,21 @@ async function selectNextTask(history) {
             title: t.title,
             focus_keyword: t.focus_keyword.toLowerCase(),
             category: t.category,
-            slug: slug
+            slug: slug,
+            tags: [
+              t.title,
+              t.focus_keyword,
+              t.category || 'Pet Sağlığı',
+              'Veteriner Rehberi',
+              'Evcil Hayvan Bakımı'
+            ]
           };
         }
       }
     }
   }
 
-  // Exhaustive search over all districts if all modes covered
+  // Fallback exhaustive
   for (const item of citiesDistricts) {
     for (const srv of services) {
       const slug = slugifyTurkish(`${item.district}-${item.city}-${srv.name}`);
@@ -666,13 +762,20 @@ async function selectNextTask(history) {
           title: `${item.district} ${srv.name} (${item.city})`,
           focus_keyword: `${item.district} ${srv.name.toLowerCase()}`,
           category: srv.category,
-          slug: slug
+          slug: slug,
+          tags: [
+            `${item.district} Veteriner`,
+            srv.name,
+            `${item.city} Pet`,
+            'Evcil Hayvan Bakımı',
+            'Veteriner Tavsiyesi'
+          ]
         };
       }
     }
   }
 
-  throw new Error("Tüm 81 il, ilçeler ve ırk konuları yayınlanmış. Yeni konu ekleyiniz.");
+  throw new Error("Tüm konular yayınlanmış. Yeni konu ekleyiniz.");
 }
 
 // Master Execution Flow
@@ -689,14 +792,14 @@ async function main() {
     const recentPosts = await fetchRecentPosts();
     const categoryId = await getOrCreateCategory(task.category || 'Genel');
 
-    // 1. Generate 2500+ Words Content
+    // 1. Generate Content (Ensuring STOP finishReason and full sections)
     const article = await generateBulletproofArticle(task, recentPosts);
-    if (!article.content_html || article.content_html.trim().length < 2000) {
-      throw new Error(`[CRITICAL] İçerik üretilemedi veya çok kısa (${article.content_html ? article.content_html.length : 0} karakter)! Boş yayın engellendi.`);
+    if (!article.content_html || article.content_html.trim().length < 6000) {
+      throw new Error(`[CRITICAL] İçerik üretilemedi veya yetersiz (${article.content_html ? article.content_html.length : 0} karakter)! Boş/kısa yayın kesinlikle engellendi.`);
     }
-    console.log(`[+] 2500+ Kelimelik İçerik Başarıyla Üretildi (${article.content_html.length} karakter)! Başlık: "${article.title}"`);
+    console.log(`[+] Eksiksiz Uzman İçeriği Üretildi (${article.content_html.length} karakter)! Başlık: "${article.title}"`);
 
-    // 2. Generate Exactly 2 1200x675 HD Images with Sharp Typography Burnt-in
+    // 2. Generate Exactly 2 1200x675 HD Images with Sharp Typography
     const images = await generateUltraHDImages(task, article.title);
     const featuredImage = images[0] || null;
     const inContentImage = images[1] || null;
@@ -721,13 +824,24 @@ async function main() {
     // 4. Sanitize and balance all HTML tags to prevent broken layouts
     article.content_html = sanitizeAndBalanceHtml(article.content_html);
 
-    // 5. Publish directly to WordPress as 'publish'
+    // 5. Generate and assign WordPress Tag IDs
+    const tagIds = [];
+    if (task.tags && Array.isArray(task.tags)) {
+      for (const tName of task.tags) {
+        const tId = await getOrCreateTag(tName);
+        if (tId) tagIds.push(tId);
+      }
+    }
+    console.log(`[+] Atanan Etiketler (${tagIds.length} adet):`, tagIds);
+
+    // 6. Publish directly to WordPress as 'publish'
     console.log(`[*] WordPress'e Yayına Alınıyor (Status: publish)...`);
     const postPayload = {
       title: article.title,
       slug: task.slug,
       status: 'publish',
       categories: [categoryId],
+      tags: tagIds,
       content: article.content_html,
       featured_media: featuredImage ? featuredImage.id : undefined,
       meta: {
@@ -758,11 +872,12 @@ async function main() {
     console.log(`[+] URL: ${postData.link}`);
     console.log(`[+] Başlık: ${article.title}`);
     console.log(`[+] Odak Kelime: ${task.focus_keyword}`);
+    console.log(`[+] Etiket Sayısı: ${tagIds.length}`);
     console.log(`[+] Öne Çıkan Görsel ID: ${featuredImage ? featuredImage.id : 'Yok'}`);
     console.log(`[+] İçerik İçi Görsel ID: ${inContentImage ? inContentImage.id : 'Yok'}`);
     console.log(`=======================================================`);
 
-    // 5. Update history
+    // 7. Update history
     history.published_slugs.push(task.slug);
     history.last_mode = task.mode;
     saveHistory(history);
