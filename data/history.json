@@ -46,7 +46,8 @@
     "maltepe-istanbul-pet-shop",
     "maltepe-istanbul-pet-kuafor",
     "atasehir-istanbul-veteriner-klinigi",
-    "atasehir-istanbul-pet-otel"
+    "atasehir-istanbul-pet-otel",
+    "atasehir-istanbul-pet-taksi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
