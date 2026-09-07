@@ -82,9 +82,10 @@
     "tuzla-istanbul-pet-kuafor",
     "zeytinburnu-istanbul-veteriner-klinigi",
     "evde-kedi-bakimi-aylik-masrafi-ne-kadar-2026-detayli-maliyet-analizi",
-    "kadikoy-istanbul-pet-shop"
+    "kadikoy-istanbul-pet-shop",
+    "pomeranian-boo-tuy-bakimi-egitimi-ve-beslenme-tuyolari"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "local_service"
+  "last_mode": "breed"
 }
