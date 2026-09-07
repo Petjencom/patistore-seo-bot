@@ -38,9 +38,10 @@
     "besiktas-istanbul-pet-shop",
     "zeytinburnu-istanbul-pet-otel",
     "fransiz-bulldog-french-bulldog-sagligi-solunum-ve-bakimi",
-    "kisirlastirilmis-kedi-mamasi-secerken-dikkat-edilmesi-gereken-7-kriter"
+    "kisirlastirilmis-kedi-mamasi-secerken-dikkat-edilmesi-gereken-7-kriter",
+    "besiktas-istanbul-pet-kuafor"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "cost_care"
+  "last_mode": "local_service"
 }
