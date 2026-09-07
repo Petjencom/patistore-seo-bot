@@ -45,9 +45,10 @@
     "sisli-istanbul-veteriner-klinigi",
     "cane-corso-karakteri-itaat-egitimi-ve-guclu-beslenme-duzeni",
     "kopeklerde-ayrilik-anksiyetesi-evde-yalniz-kalma-egitimi-nasil-verilir",
-    "sisli-istanbul-pet-otel"
+    "sisli-istanbul-pet-otel",
+    "ragdoll-kedisi-ozellikleri-uysal-karakteri-ve-tuy-bakimi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "local_service"
+  "last_mode": "breed"
 }
