@@ -25,9 +25,10 @@
     "sisli-istanbul-pet-taksi",
     "kadikoy-istanbul-pet-kuafor",
     "maltese-terrier-karakteri-gunluk-bakimi-ve-tuy-sagligi",
-    "kedi-kisirlastirma-ucretleri-2026-ve-operasyon-sonrasi-evde-bakim"
+    "kedi-kisirlastirma-ucretleri-2026-ve-operasyon-sonrasi-evde-bakim",
+    "besiktas-istanbul-veteriner-klinigi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "cost_care"
+  "last_mode": "local_service"
 }
