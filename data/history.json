@@ -39,9 +39,10 @@
     "zeytinburnu-istanbul-pet-otel",
     "fransiz-bulldog-french-bulldog-sagligi-solunum-ve-bakimi",
     "kisirlastirilmis-kedi-mamasi-secerken-dikkat-edilmesi-gereken-7-kriter",
-    "besiktas-istanbul-pet-kuafor"
+    "besiktas-istanbul-pet-kuafor",
+    "maine-coon-irki-dev-kedilerin-beslenmesi-sagligi-ve-bakimi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "local_service"
+  "last_mode": "breed"
 }
