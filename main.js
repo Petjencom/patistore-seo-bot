@@ -718,6 +718,41 @@ Hemen ardından makale HTML içeriğini (özet, <h2>, <h3>, <p>, <table>, <ul>, 
     contentHtml = contentHtml + authorBoxHtml;
   }
 
+  // Ensure 100% valid and guaranteed Schema.org JSON-LD FAQPage block
+  if (!contentHtml.includes('application/ld+json')) {
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": `${toTurkishTitleCase(task.focus_keyword)} 2026 Yılında Ne Kadardır?`,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": `${toTurkishTitleCase(task.focus_keyword)} hakkında güncel klinik ve uzman analizlerine göre maliyetler temel gereksinimler, mama kalitesi ve periyodik veteriner kontrollerine bağlı olarak belirlenmektedir.`
+          }
+        },
+        {
+          "@type": "Question",
+          "name": `${toTurkishTitleCase(task.focus_keyword)} Sürecinde Nelere Dikkat Edilmelidir?`,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Düzenli aşı takvimi, dengeli beslenme, parazit koruması ve erken tanı amaçlı rutin veteriner muayeneleri kesinlikle aksatılmamalıdır."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Rutin Veteriner Hekim Kontrolleri Hangi Sıklıkla Yapılmalıdır?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Gelişim çağındaki genç dostlarımız için ayda bir, yetişkin ve stabil evcil hayvanlar için yılda en az 2 kez detaylı genel kontrol önerilmektedir."
+          }
+        }
+      ]
+    };
+    contentHtml += `\n<script type="application/ld+json">${JSON.stringify(faqSchema)}</script>\n`;
+  }
+
   const finalTitle = generateDiverseTitle(extractedTitle || task.title, task.focus_keyword, task.mode);
   const finalMeta = extractedMeta || `${task.focus_keyword} hakkında 2026 güncel veteriner hekim tavsiyeleri, klinik rehber ve bakım ipuçları.`;
 
