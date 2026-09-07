@@ -43,9 +43,10 @@
     "maine-coon-irki-dev-kedilerin-beslenmesi-sagligi-ve-bakimi",
     "veteriner-muayene-ucretleri-2026-tahlil-rontgen-ve-ultrason-masraflari",
     "sisli-istanbul-veteriner-klinigi",
-    "cane-corso-karakteri-itaat-egitimi-ve-guclu-beslenme-duzeni"
+    "cane-corso-karakteri-itaat-egitimi-ve-guclu-beslenme-duzeni",
+    "kopeklerde-ayrilik-anksiyetesi-evde-yalniz-kalma-egitimi-nasil-verilir"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "breed"
+  "last_mode": "cost_care"
 }
