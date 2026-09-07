@@ -46,9 +46,10 @@
     "cane-corso-karakteri-itaat-egitimi-ve-guclu-beslenme-duzeni",
     "kopeklerde-ayrilik-anksiyetesi-evde-yalniz-kalma-egitimi-nasil-verilir",
     "sisli-istanbul-pet-otel",
-    "ragdoll-kedisi-ozellikleri-uysal-karakteri-ve-tuy-bakimi"
+    "ragdoll-kedisi-ozellikleri-uysal-karakteri-ve-tuy-bakimi",
+    "kedilerde-su-icme-aliskanligi-kazandirma-ve-otomatik-su-pinari-secimi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "breed"
+  "last_mode": "cost_care"
 }
