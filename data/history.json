@@ -51,9 +51,10 @@
     "zeytinburnu-istanbul-pet-taksi",
     "zeytinburnu-istanbul-pet-shop",
     "zeytinburnu-istanbul-pet-kuafor",
-    "yavru-kedi-ilk-veteriner-kontrolu-parazit-tedavisi-ve-beslenme-plani"
+    "yavru-kedi-ilk-veteriner-kontrolu-parazit-tedavisi-ve-beslenme-plani",
+    "bahcelievler-istanbul-veteriner-klinigi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "cost_care"
+  "last_mode": "local_service"
 }
