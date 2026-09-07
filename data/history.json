@@ -54,9 +54,10 @@
     "yavru-kedi-ilk-veteriner-kontrolu-parazit-tedavisi-ve-beslenme-plani",
     "bahcelievler-istanbul-veteriner-klinigi",
     "bengal-kedisi-vahsi-desenleri-enerjisi-ve-gunluk-bakimi",
-    "bahcelievler-istanbul-pet-otel"
+    "bahcelievler-istanbul-pet-otel",
+    "labrador-retriever-karakteri-yuzme-tutkusu-ve-bakim-tuyolari"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "local_service"
+  "last_mode": "breed"
 }
