@@ -29,9 +29,10 @@
     "besiktas-istanbul-veteriner-klinigi",
     "siyam-kedisi-karakteri-iletisim-becerisi-ve-bakim-rehberi",
     "kopek-kisirlastirma-fiyatlari-ve-ameliyat-sonrasi-iyilesme-rehberi",
-    "besiktas-istanbul-pet-otel"
+    "besiktas-istanbul-pet-otel",
+    "toy-poodle-kanis-tuy-dokulmeme-ozelligi-ve-bakim-ipuclari"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "local_service"
+  "last_mode": "breed"
 }
