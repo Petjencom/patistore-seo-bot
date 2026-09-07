@@ -673,20 +673,20 @@ Hemen ardından makale HTML içeriğini (özet, <h2>, <h3>, <p>, <table>, <ul>, 
 
         console.log(`    [+] Model yanıtı alındı (${generatedText.length} karakter, Bitiş Kodu: ${finishReason})`);
 
-        if (finishReason === 'STOP' && generatedText.trim().length > 6000) {
+        if ((finishReason === 'STOP' && generatedText.trim().length > 5000) || (finishReason === 'MAX_TOKENS' && generatedText.trim().length > 10000)) {
           rawOutput = generatedText;
           break;
         } else if (finishReason === 'MAX_TOKENS') {
-          console.log(`    [!] Çıktı token limitine takıldı, yeniden deneniyor...`);
+          console.log(`    [!] Çıktı token limitine takıldı ve yetersiz uzunlukta, yeniden deneniyor...`);
         }
       } catch (e) {
         console.error(`    [-] Bağlantı hatası [${modelName}]:`, e.message);
       }
     }
-    if (rawOutput && rawOutput.trim().length > 6000) break;
+    if (rawOutput && rawOutput.trim().length > 5000) break;
   }
 
-  if (!rawOutput || rawOutput.trim().length < 6000) {
+  if (!rawOutput || rawOutput.trim().length < 5000) {
     throw new Error('Gemini boş veya eksik içerik döndürdü. Güvenlik kilidi devreye girdi.');
   }
 
