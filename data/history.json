@@ -80,9 +80,10 @@
     "tuzla-istanbul-pet-taksi",
     "tuzla-istanbul-pet-shop",
     "tuzla-istanbul-pet-kuafor",
-    "zeytinburnu-istanbul-veteriner-klinigi"
+    "zeytinburnu-istanbul-veteriner-klinigi",
+    "evde-kedi-bakimi-aylik-masrafi-ne-kadar-2026-detayli-maliyet-analizi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "local_service"
+  "last_mode": "cost_care"
 }
