@@ -134,17 +134,17 @@ function capitalizeHtmlHeadings(html) {
   });
 }
 
-// Section B9: 10-Step Mandatory Pre-Publish Quality & Integrity Checklist
-function validatePrePublishChecklist(task, article, images) {
+// Section B9: 12-Step Mandatory Pre-Publish Quality & Integrity Checklist
+function validatePrePublishChecklist(task, article, images, categoryId, recentPosts = []) {
   console.log('\n=======================================================');
-  console.log('=== BÖLÜM B9: 10 MADDELİK PRE-PUBLISH CHECKLIST DENETİMİ ===');
+  console.log('=== BÖLÜM B9: 12 MADDELİK PRE-PUBLISH CHECKLIST DENETİMİ ===');
   console.log('=======================================================');
   const checks = [];
 
   // 1. Metin Bütünlüğü Kontrolü (Bozuk/düşmüş karakterler veya kesik kelimeler)
   const corruptRegex = /\b(kap\s+amlı|tav\s+iyeler|tak\s+i|kı\s+ırlaştırma|be\s+leme|profe\s+yonel|bilinme\s+i|te\s+i)\b/i;
   if (corruptRegex.test(article.title) || corruptRegex.test(article.content_html)) {
-    throw new Error('[CHECKLIST FAIL 1/10] Metinde bozuk karakter / düşmüş harf tespit edildi!');
+    throw new Error('[CHECKLIST FAIL 1/12] Metinde bozuk karakter / düşmüş harf tespit edildi!');
   }
   checks.push('✓ 1. Metin Bütünlüğü: Kusursuz (Düşmüş harf veya bozuk kelime yok)');
 
@@ -152,7 +152,7 @@ function validatePrePublishChecklist(task, article, images) {
   const plainText = article.content_html.replace(/<[^>]+>/g, ' ');
   const wordCount = plainText.trim().split(/\s+/).filter(Boolean).length;
   if (wordCount < 850 || article.content_html.length < 5000) {
-    throw new Error(`[CHECKLIST FAIL 2/10] Yetersiz içerik uzunluğu: ${wordCount} kelime, ${article.content_html.length} karakter! Minimum sınırın altında.`);
+    throw new Error(`[CHECKLIST FAIL 2/12] Yetersiz içerik uzunluğu: ${wordCount} kelime, ${article.content_html.length} karakter! Minimum sınırın altında.`);
   }
   checks.push(`✓ 2. İçerik Uzunluğu: ${wordCount} kelime (${article.content_html.length} karakter)`);
 
@@ -160,56 +160,74 @@ function validatePrePublishChecklist(task, article, images) {
   const h2Matches = article.content_html.match(/<h2/gi) || [];
   const h3Matches = article.content_html.match(/<h3/gi) || [];
   if (h2Matches.length < 3 || h3Matches.length < 2) {
-    throw new Error(`[CHECKLIST FAIL 3/10] Başlık hiyerarşisi yetersiz: ${h2Matches.length} H2, ${h3Matches.length} H3 bulundu!`);
+    throw new Error(`[CHECKLIST FAIL 3/12] Başlık hiyerarşisi yetersiz: ${h2Matches.length} H2, ${h3Matches.length} H3 bulundu!`);
   }
   checks.push(`✓ 3. Başlık Hiyerarşisi: ${h2Matches.length} adet H2, ${h3Matches.length} adet H3 hiyerarşik olarak mevcut`);
 
   // 4. Odak Anahtar Kelime Uyumu (Başlık ve gövde kontrolü)
   const kw = task.focus_keyword.toLowerCase();
   if (!article.content_html.toLowerCase().includes(kw)) {
-    throw new Error(`[CHECKLIST FAIL 4/10] Odak anahtar kelime "${task.focus_keyword}" makale gövdesinde bulunamadı!`);
+    throw new Error(`[CHECKLIST FAIL 4/12] Odak anahtar kelime "${task.focus_keyword}" makale gövdesinde bulunamadı!`);
   }
   checks.push(`✓ 4. Odak Kelime Entegrasyonu: Başlıkta ve metin gövdesinde başarıyla doğrulandı`);
 
   // 5. Görsel Adedi ve Çözünürlük (Tam 2 adet 1200x675 HD görsel)
   if (!images || images.length < 2 || !images[0]?.id || !images[1]?.id) {
-    throw new Error('[CHECKLIST FAIL 5/10] Tam 2 adet (öne çıkan + içerik içi) HD görsel doğrulanamadı!');
+    throw new Error('[CHECKLIST FAIL 5/12] Tam 2 adet (öne çıkan + içerik içi) HD görsel doğrulanamadı!');
   }
   checks.push(`✓ 5. Görsel Standartı: Tam 2 adet 1200x675 HD görsel yüklendi ve ilişkilendirildi`);
 
   // 6. Görsel Alt Etiketleri ve Tipografi Kontrolü
   if (!images[0].alt || !images[1].alt) {
-    throw new Error('[CHECKLIST FAIL 6/10] Görsel alt etiketleri (alt text) eksik veya geçersiz!');
+    throw new Error('[CHECKLIST FAIL 6/12] Görsel alt etiketleri (alt text) eksik veya geçersiz!');
   }
   checks.push(`✓ 6. Görsel Alt Metinleri: SEO ve erişilebilirlik uyumlu alt etiketleri mevcut`);
 
   // 7. EEAT Otorite ve Yazar Profili (Dr. Melis Kaya)
   if (!article.content_html.includes('Dr. Melis Kaya')) {
-    throw new Error('[CHECKLIST FAIL 7/10] Dr. Melis Kaya EEAT uzman yazar kutusu içerikte eksik!');
+    throw new Error('[CHECKLIST FAIL 7/12] Dr. Melis Kaya EEAT uzman yazar kutusu içerikte eksik!');
   }
   checks.push(`✓ 7. EEAT Otorite Doğrulaması: Dr. Melis Kaya yazar profili ve klinik atıflar içerikte mevcut`);
 
   // 8. Yapısal Veri (Schema.org FAQPage / JSON-LD)
   if (!article.content_html.includes('application/ld+json')) {
-    throw new Error('[CHECKLIST FAIL 8/10] Schema.org FAQPage JSON-LD yapısal verisi eksik!');
+    throw new Error('[CHECKLIST FAIL 8/12] Schema.org FAQPage JSON-LD yapısal verisi eksik!');
   }
   checks.push(`✓ 8. Schema.org Doğrulaması: FAQPage JSON-LD yapısal veri bloğu doğrulandı`);
 
   // 9. URL Slug Kanonizasyonu ve Benzersizlik (-2, -3 numaralı ekler yasaktır)
   if (/-\d+$/.test(task.slug)) {
-    throw new Error(`[CHECKLIST FAIL 9/10] Hedef slug numaralı ek içeriyor (${task.slug})! Duplicate URL kesinlikle yasaktır.`);
+    throw new Error(`[CHECKLIST FAIL 9/12] Hedef slug numaralı ek içeriyor (${task.slug})! Duplicate URL kesinlikle yasaktır.`);
   }
   checks.push(`✓ 9. URL Slug Kanonizasyonu: "${task.slug}" temiz ve benzersiz`);
 
   // 10. İç Linkleme Doğrulaması
   const internalLinks = article.content_html.match(/<a\s+[^>]*href=/gi) || [];
   if (internalLinks.length < 2) {
-    throw new Error(`[CHECKLIST FAIL 10/10] İç linkleme yetersiz (${internalLinks.length} adet)! En az 2 iç link zorunludur.`);
+    throw new Error(`[CHECKLIST FAIL 10/12] İç linkleme yetersiz (${internalLinks.length} adet)! En az 2 iç link zorunludur.`);
   }
   checks.push(`✓ 10. İç Linkleme: ${internalLinks.length} adet site içi organik bağlantı doğrulandı`);
 
+  // 11. Kategori Güvenliği (Uncategorized / ID 1 kesinlikle engellendi)
+  if (!categoryId || categoryId === 1) {
+    throw new Error(`[CHECKLIST FAIL 11/12] Geçersiz Kategori ID: ${categoryId}! Uncategorized (1) kesinlikle yasaktır.`);
+  }
+  checks.push(`✓ 11. Kategori Güvenliği: Kategori ID ${categoryId} onaylandı (Uncategorized engellendi)`);
+
+  // 12. Fuzzy Title Duplicate Kontrolü (%70+ eşik)
+  if (recentPosts && recentPosts.length) {
+    for (const rp of recentPosts) {
+      if (!rp.title) continue;
+      const sim = calculateStringSimilarity(article.title, rp.title);
+      if (sim >= 0.70) {
+        throw new Error(`[CHECKLIST FAIL 12/12] Duplicate Başlık Tespiti! Benzerlik: %${Math.round(sim * 100)} - Mevcut: "${rp.title}" vs Yeni: "${article.title}"`);
+      }
+    }
+  }
+  checks.push(`✓ 12. Duplicate Başlık Koruması: Benzerlik kontrolü (%70 eşik) başarıyla geçildi`);
+
   console.log(checks.join('\n'));
-  console.log('=== [✓] 10/10 PRE-PUBLISH CHECKLIST BAŞARIYLA GEÇİLDİ ===\n');
+  console.log('=== [✓] 12/12 PRE-PUBLISH CHECKLIST BAŞARIYLA GEÇİLDİ ===\n');
   return true;
 }
 
@@ -252,20 +270,22 @@ function saveHistory(history) {
   }
 }
 
-// Fetch recent posts for internal linking
+// Fetch recent posts for internal linking (100% clean canonicals only)
 async function fetchRecentPosts() {
   try {
-    const res = await fetch(`${WP_URL}/wp-json/wp/v2/posts?per_page=25&_fields=id,title,link,slug`, {
+    const res = await fetch(`${WP_URL}/wp-json/wp/v2/posts?status=publish&per_page=40&_fields=id,title,link,slug`, {
       headers: { 'Authorization': AUTH_HEADER }
     });
     if (res.ok) {
       const posts = await res.json();
-      return posts.map(p => ({
-        id: p.id,
-        title: p.title.rendered,
-        link: p.link,
-        slug: p.slug
-      }));
+      return posts
+        .filter(p => !/-\d+$/.test(p.slug)) // Asla numaralı (-2, -3) linkleri iç linkleme listesine koyma
+        .map(p => ({
+          id: p.id,
+          title: decodeHtmlEntities(p.title.rendered),
+          link: p.link,
+          slug: p.slug
+        }));
     }
   } catch (e) {
     console.error('[-] İç linkleme için eski yazılar çekilemedi:', e.message);
@@ -273,36 +293,87 @@ async function fetchRecentPosts() {
   return [];
 }
 
-// Get or create category
+function decodeHtmlEntities(str) {
+  if (!str) return '';
+  return str
+    .replace(/&amp;/g, '&')
+    .replace(/&#038;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+}
+
+// Calculate Dice coefficient similarity between two strings (0.0 to 1.0)
+function calculateStringSimilarity(str1, str2) {
+  const s1 = slugifyTurkish(str1).replace(/-/g, ' ');
+  const s2 = slugifyTurkish(str2).replace(/-/g, ' ');
+  if (s1 === s2) return 1.0;
+  if (s1.length < 2 || s2.length < 2) return 0.0;
+
+  const getBigrams = (str) => {
+    const bigrams = new Set();
+    for (let i = 0; i < str.length - 1; i++) {
+      bigrams.add(str.substring(i, i + 2));
+    }
+    return bigrams;
+  };
+
+  const b1 = getBigrams(s1);
+  const b2 = getBigrams(s2);
+  let intersection = 0;
+  for (const b of b1) {
+    if (b2.has(b)) intersection++;
+  }
+  return (2.0 * intersection) / (b1.size + b2.size);
+}
+
+// Get or create category with HTML entity decoding and Uncategorized prevention
 async function getOrCreateCategory(categoryName) {
+  const cleanName = toTurkishTitleCase(categoryName || 'Evcil Hayvan Bakımı');
+  const targetSlug = slugifyTurkish(cleanName);
+
   try {
-    const cleanName = toTurkishTitleCase(categoryName);
-    const searchRes = await fetch(`${WP_URL}/wp-json/wp/v2/categories?search=${encodeURIComponent(cleanName)}`, {
+    // 1. Fetch all categories
+    const res = await fetch(`${WP_URL}/wp-json/wp/v2/categories?per_page=100`, {
       headers: { 'Authorization': AUTH_HEADER }
     });
-    if (searchRes.ok) {
-      const cats = await searchRes.json();
-      const existing = cats.find(c => c.name.toLowerCase() === cleanName.toLowerCase());
-      if (existing) return existing.id;
+    if (res.ok) {
+      const cats = await res.json();
+      const existing = cats.find(c => {
+        const decodedName = decodeHtmlEntities(c.name).toLowerCase();
+        return decodedName === cleanName.toLowerCase() || c.slug === targetSlug;
+      });
+      if (existing) {
+        if (existing.id === 1) {
+          throw new Error(`[CRITICAL] Kategori "Uncategorized" (ID: 1) olamaz! Hedef: ${cleanName}`);
+        }
+        return existing.id;
+      }
     }
 
+    // 2. Create category if not found
     const createRes = await fetch(`${WP_URL}/wp-json/wp/v2/categories`, {
       method: 'POST',
       headers: {
         'Authorization': AUTH_HEADER,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name: cleanName })
+      body: JSON.stringify({ name: cleanName, slug: targetSlug })
     });
     if (createRes.ok) {
       const newCat = await createRes.json();
       console.log(`[+] Yeni Kategori Açıldı: ${cleanName} (ID: ${newCat.id})`);
+      if (newCat.id === 1) throw new Error('[CRITICAL] Kategori ID 1 olamaz!');
       return newCat.id;
     }
   } catch (e) {
-    console.error(`[-] Kategori oluşturulamadı (${categoryName}):`, e.message);
+    console.error(`[-] Kategori çözümlenemedi (${categoryName}):`, e.message);
+    throw new Error(`[CHECKLIST BLOCKED] Geçerli kategori atanamadı (${categoryName}): ${e.message}`);
   }
-  return 1;
+
+  // Fallback to Pet Rehberi or general valid category (NEVER 1)
+  throw new Error(`[CHECKLIST BLOCKED] Kategori bulunamadı ve Uncategorized engellendi: ${cleanName}`);
 }
 
 // Get or create tag with Turkish Title Case
@@ -770,8 +841,9 @@ async function selectNextTask(history) {
   if (lastMode === "local_service") modesToTry = ["breed", "cost_care", "local_service"];
   else if (lastMode === "breed") modesToTry = ["cost_care", "local_service", "breed"];
 
-  // 1. Fetch live WordPress slugs to prevent ANY duplicate publishing
+  // 1. Fetch live WordPress slugs and titles to prevent ANY duplicate publishing
   const livePublishedSlugs = new Set(history.published_slugs || []);
+  const livePublishedTitles = [];
   try {
     const res = await fetch(`${WP_URL}/wp-json/wp/v2/posts?per_page=100&_fields=slug,title`, {
       headers: { 'Authorization': AUTH_HEADER }
@@ -784,13 +856,25 @@ async function selectNextTask(history) {
           livePublishedSlugs.add(p.slug.replace(/-\d+$/, '').toLowerCase());
         }
         if (p.title && p.title.rendered) {
-          livePublishedSlugs.add(slugifyTurkish(p.title.rendered));
+          const tClean = decodeHtmlEntities(p.title.rendered);
+          livePublishedTitles.push(tClean);
+          livePublishedSlugs.add(slugifyTurkish(tClean));
         }
       }
     }
   } catch (e) {
     console.error('[-] Canlı yazı listesi çekilemedi:', e.message);
   }
+
+  const isDuplicateOrTooSimilar = (candidateTitle, candidateSlug) => {
+    if (livePublishedSlugs.has(candidateSlug)) return true;
+    for (const existingTitle of livePublishedTitles) {
+      if (calculateStringSimilarity(candidateTitle, existingTitle) >= 0.70) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   const rawCities = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'cities_districts.json'), 'utf8'));
   const rawServices = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'services.json'), 'utf8'));
@@ -818,12 +902,13 @@ async function selectNextTask(history) {
     if (nextMode === "local_service") {
       for (const item of citiesDistricts) {
         for (const srv of services) {
+          const candTitle = `${item.district} ${srv.name} (${item.city})`;
           const slug = slugifyTurkish(`${item.district}-${item.city}-${srv.name}`);
           const altSlug = slugifyTurkish(`${item.district}-${srv.name}`);
-          if (!livePublishedSlugs.has(slug) && !livePublishedSlugs.has(altSlug)) {
+          if (!isDuplicateOrTooSimilar(candTitle, slug) && !isDuplicateOrTooSimilar(candTitle, altSlug)) {
             return {
               mode: "local_service",
-              title: `${item.district} ${srv.name} (${item.city})`,
+              title: candTitle,
               focus_keyword: `${item.district} ${srv.name.toLowerCase()}`,
               category: srv.category,
               slug: slug,
@@ -844,7 +929,7 @@ async function selectNextTask(history) {
         const bKw = b.focus_keyword || `${b.name} bakımı`;
         const slug = slugifyTurkish(bTitle);
         const kwSlug = slugifyTurkish(bKw);
-        if (!livePublishedSlugs.has(slug) && !livePublishedSlugs.has(kwSlug)) {
+        if (!isDuplicateOrTooSimilar(bTitle, slug) && !isDuplicateOrTooSimilar(bTitle, kwSlug)) {
           return {
             mode: "breed",
             title: bTitle,
@@ -865,7 +950,7 @@ async function selectNextTask(history) {
       for (const t of hitTopics) {
         const slug = slugifyTurkish(t.title);
         const kwSlug = slugifyTurkish(t.focus_keyword);
-        if (!livePublishedSlugs.has(slug) && !livePublishedSlugs.has(kwSlug)) {
+        if (!isDuplicateOrTooSimilar(t.title, slug) && !isDuplicateOrTooSimilar(t.title, kwSlug)) {
           return {
             mode: "cost_care",
             title: t.title,
@@ -888,11 +973,12 @@ async function selectNextTask(history) {
   // Fallback exhaustive
   for (const item of citiesDistricts) {
     for (const srv of services) {
+      const candTitle = `${item.district} ${srv.name} (${item.city})`;
       const slug = slugifyTurkish(`${item.district}-${item.city}-${srv.name}`);
-      if (!livePublishedSlugs.has(slug)) {
+      if (!isDuplicateOrTooSimilar(candTitle, slug)) {
         return {
           mode: "local_service",
-          title: `${item.district} ${srv.name} (${item.city})`,
+          title: candTitle,
           focus_keyword: `${item.district} ${srv.name.toLowerCase()}`,
           category: srv.category,
           slug: slug,
@@ -967,8 +1053,8 @@ async function main() {
     }
     console.log(`[+] Atanan Etiketler (${tagIds.length} adet):`, tagIds);
 
-    // 6. Section B9: Validate 10-Step Pre-Publish Quality Checklist
-    validatePrePublishChecklist(task, article, images);
+    // 6. Section B9: Validate 12-Step Pre-Publish Quality Checklist
+    validatePrePublishChecklist(task, article, images, categoryId, recentPosts);
 
     // 7. Publish directly to WordPress as 'publish'
     console.log(`[*] WordPress'e Yayına Alınıyor (Status: publish)...`);
