@@ -99,9 +99,10 @@
     "gaziosmanpasa-istanbul-pet-shop",
     "gaziosmanpasa-istanbul-pet-kuafor",
     "sphynx-tuysuz-kedi-cilt-bakimi-beslenmesi-ve-saglik-rehberi",
-    "buyukcekmece-istanbul-veteriner-klinigi"
+    "buyukcekmece-istanbul-veteriner-klinigi",
+    "sibirya-kurdu-husky-egzersiz-ihtiyaci-sicak-havada-bakimi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "local_service"
+  "last_mode": "breed"
 }
