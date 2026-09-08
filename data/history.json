@@ -94,7 +94,8 @@
     "kagithane-istanbul-pet-shop",
     "kagithane-istanbul-pet-kuafor",
     "gaziosmanpasa-istanbul-veteriner-klinigi",
-    "gaziosmanpasa-istanbul-pet-otel"
+    "gaziosmanpasa-istanbul-pet-otel",
+    "gaziosmanpasa-istanbul-pet-taksi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
