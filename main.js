@@ -249,6 +249,9 @@ function cleanArticleHtml(raw) {
   // Strip trailing meta notes
   clean = clean.replace(/<p[^>]*>\s*(Not|Önemli Not|Yazar Notu|Kaynaklar|Hazırlayan|Umarım):.*?(<\/p>|$)/gi, '');
 
+  // Strip unescaped raw AI JSON-LD blocks (we re-inject 100% valid JSON.stringify block below)
+  clean = clean.replace(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '');
+
   return clean.trim();
 }
 
