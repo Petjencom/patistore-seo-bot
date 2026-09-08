@@ -477,102 +477,187 @@ function wrapBannerText(text, maxCharsPerLine = 22) {
   return lines;
 }
 
-// Generate Pet Pattern Icons SVG with High-Contrast Centered Frosted Card
-function generatePetPatternSvg(text, subtitle = '') {
-  const upperText = (text || '').toLocaleUpperCase('tr-TR');
-  const lines = wrapBannerText(upperText, 20);
+// Autonomous Smart Pet Image Prompt Generator (Gemini Powered)
+async function getAutoImagePrompt(articleTitleOrContent) {
+  const systemPrompt = 
+    "You are an autonomous pet image prompt generator. Analyze the given Turkish pet article/title. " +
+    "Determine the animal, setting (grooming salon, pet taxi, cozy home, vet clinic, park), " +
+    "and extract a concise 2-4 word Turkish focus keyword in UPPERCASE. " +
+    "Output ONLY a single English prompt for a 16:9 photorealistic commercial pet photography, ending with: " +
+    "...with bold legible 3D Turkish typography text '[EXTRACTED_KEYWORD]' centered cleanly in high contrast with strong drop shadow. " +
+    "No chat, no explanations.";
 
-  let fontSize = 56;
-  if (lines.length > 2) fontSize = 46;
-  if (lines.length > 3) fontSize = 38;
+  const models = ['gemini-3.6-flash', 'gemini-flash-latest', 'gemini-3.7-flash', 'gemini-3.5-flash'];
+  
+  for (const model of models) {
+    try {
+      const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+      const response = await fetch(geminiEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: `${systemPrompt}\n\nMakale / Başlık: ${articleTitleOrContent}` }]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048
+          }
+        })
+      });
 
-  const lineHeight = fontSize * 1.25;
+      if (response.status === 429 || response.status === 503) {
+        console.log(`    [!] Görsel prompt motoru rate limit [${model}]. Sonraki modele geçiliyor...`);
+        await new Promise(r => setTimeout(r, 2000));
+        continue;
+      }
+
+      if (response.ok) {
+        const data = await response.json();
+        const cand = data.candidates?.[0];
+        const textParts = cand?.content?.parts?.filter(p => p.text && !p.thought);
+        const text = textParts && textParts.length ? textParts.map(p => p.text).join('\n').trim() : (cand?.content?.parts?.[0]?.text?.trim() || '');
+        if (text) return text;
+      }
+    } catch (e) {
+      console.error(`Prompt motoru ${model} hatası:`, e.message);
+    }
+  }
+  return null;
+}
+
+// Extract 2-4 words Turkish focus keyword from generated prompt or fallback to title
+function extractKeywordFromPrompt(promptText, fallbackText) {
+  if (promptText) {
+    const match = promptText.match(/typography text\s*['"“]([^'"”]+)['"”]/i);
+    if (match && match[1] && match[1].trim().length >= 3) {
+      return match[1].trim().toLocaleUpperCase('tr-TR');
+    }
+  }
+  // Fallback extraction from title
+  const words = (fallbackText || '').trim().split(/\s+/).slice(0, 4);
+  return words.join(' ').toLocaleUpperCase('tr-TR');
+}
+
+// Generate 16:9 High-Contrast 3D Turkish Typography SVG with Strong Drop Shadow
+function generate3DTypographySvg(mainKeyword, subtitle = '', sceneDescription = '') {
+  const upperText = (mainKeyword || '').toLocaleUpperCase('tr-TR');
+  const lines = wrapBannerText(upperText, 22);
+
+  let fontSize = 58;
+  if (lines.length > 2) fontSize = 48;
+  if (lines.length > 3) fontSize = 40;
+
+  const lineHeight = fontSize * 1.28;
   const totalHeight = lines.length * lineHeight;
   const startY = (675 - totalHeight) / 2 + (fontSize * 0.85);
 
   const textSvgLines = lines.map((line, idx) => {
     const yPos = startY + (idx * lineHeight);
-    return `<text x="600" y="${yPos}" text-anchor="middle" font-family="'Montserrat', 'Arial Black', sans-serif" font-size="${fontSize}" font-weight="900" fill="#0f172a" letter-spacing="1.5">${escapeXml(line)}</text>`;
+    return `<text x="600" y="${yPos}" text-anchor="middle" font-family="'Montserrat', 'Arial Black', sans-serif" font-size="${fontSize}" font-weight="900" fill="#0f172a" letter-spacing="2" filter="url(#textDropShadow)">${escapeXml(line)}</text>`;
   }).join('\n');
 
   const subtitleSvg = subtitle
-    ? `<text x="600" y="${startY + (lines.length * lineHeight) + 25}" text-anchor="middle" font-family="'Inter', sans-serif" font-size="20" font-weight="600" fill="#64748b" letter-spacing="1">${escapeXml(subtitle)}</text>`
+    ? `<text x="600" y="${startY + (lines.length * lineHeight) + 26}" text-anchor="middle" font-family="'Inter', -apple-system, sans-serif" font-size="21" font-weight="700" fill="#475569" letter-spacing="1.2">${escapeXml(subtitle)}</text>`
     : '';
 
-  const cardWidth = 960;
-  const cardHeight = Math.max(280, totalHeight + 140);
+  const cardWidth = 980;
+  const cardHeight = Math.max(290, totalHeight + 150);
   const cardX = (1200 - cardWidth) / 2;
   const cardY = (675 - cardHeight) / 2;
 
   return `
   <svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <pattern id="petDoodle" width="200" height="200" patternUnits="userSpaceOnUse">
-        <circle cx="40" cy="40" r="10" fill="none" stroke="#f43f5e" stroke-width="3.5" />
-        <circle cx="28" cy="24" r="4.5" fill="none" stroke="#f43f5e" stroke-width="3" />
-        <circle cx="40" cy="18" r="4.5" fill="none" stroke="#f43f5e" stroke-width="3" />
-        <circle cx="52" cy="24" r="4.5" fill="none" stroke="#f43f5e" stroke-width="3" />
+      <!-- Pet Pattern Doodle for Rich Commercial Background -->
+      <pattern id="petDoodle" width="220" height="220" patternUnits="userSpaceOnUse">
+        <circle cx="45" cy="45" r="11" fill="none" stroke="#f43f5e" stroke-width="3" />
+        <circle cx="32" cy="27" r="5" fill="none" stroke="#f43f5e" stroke-width="3" />
+        <circle cx="45" cy="20" r="5" fill="none" stroke="#f43f5e" stroke-width="3" />
+        <circle cx="58" cy="27" r="5" fill="none" stroke="#f43f5e" stroke-width="3" />
 
-        <path d="M 125,40 L 155,40 M 125,35 A 5,5 0 0,0 120,40 A 5,5 0 0,0 125,45 M 155,35 A 5,5 0 0,1 160,40 A 5,5 0 0,1 155,45" fill="none" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round" />
+        <path d="M 135,45 L 165,45 M 135,40 A 5,5 0 0,0 130,45 A 5,5 0 0,0 135,50 M 165,40 A 5,5 0 0,1 170,45 A 5,5 0 0,1 165,50" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" />
 
-        <path d="M 40,130 L 60,110 L 80,130 L 80,165 L 40,165 Z M 52,165 L 52,145 A 8,8 0 0,1 68,145 L 68,165" fill="none" stroke="#10b981" stroke-width="3.5" stroke-linejoin="round" />
+        <path d="M 45,140 L 65,120 L 85,140 L 85,175 L 45,175 Z M 57,175 L 57,155 A 8,8 0 0,1 73,155 L 73,175" fill="none" stroke="#10b981" stroke-width="3" stroke-linejoin="round" />
 
-        <circle cx="150" cy="140" r="22" fill="none" stroke="#f59e0b" stroke-width="3.5" />
-        <path d="M 140,140 Q 150,130 160,140 Q 150,150 140,140 Z M 135,135 L 140,140 L 135,145 Z" fill="none" stroke="#f59e0b" stroke-width="3" />
+        <circle cx="160" cy="150" r="24" fill="none" stroke="#f59e0b" stroke-width="3" />
+        <path d="M 150,150 Q 160,140 170,150 Q 160,160 150,150 Z" fill="none" stroke="#f59e0b" stroke-width="3" />
 
-        <path d="M 95,85 L 125,85 L 120,105 L 100,105 Z" fill="none" stroke="#8b5cf6" stroke-width="3.5" stroke-linejoin="round" />
-
-        <path d="M 180,85 A 6,6 0 0,0 170,85 Q 170,95 180,102 Q 190,95 190,85 A 6,6 0 0,0 180,85 Z" fill="none" stroke="#ec4899" stroke-width="3" />
+        <path d="M 105,95 L 135,95 L 130,115 L 110,115 Z" fill="none" stroke="#8b5cf6" stroke-width="3" stroke-linejoin="round" />
+        <path d="M 190,95 A 6,6 0 0,0 180,95 Q 180,105 190,112 Q 200,105 200,95 A 6,6 0 0,0 190,95 Z" fill="none" stroke="#ec4899" stroke-width="3" />
       </pattern>
 
-      <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
-        <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="rgba(15,23,42,0.18)" />
-        <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(15,23,42,0.08)" />
+      <!-- Ultra-Strong Drop Shadow Filter for 3D Typography -->
+      <filter id="textDropShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="rgba(15,23,42,0.35)" />
+        <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="rgba(15,23,42,0.25)" />
       </filter>
 
+      <!-- Frosted Card High-Contrast Filter -->
+      <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="20" stdDeviation="28" flood-color="rgba(15,23,42,0.22)" />
+        <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="rgba(15,23,42,0.12)" />
+      </filter>
+
+      <!-- Frosted Glass Gradient (Ensures Text NEVER Blends with Background) -->
       <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.96" />
-        <stop offset="100%" stop-color="#f8fafc" stop-opacity="0.94" />
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.97" />
+        <stop offset="100%" stop-color="#f8fafc" stop-opacity="0.95" />
       </linearGradient>
 
+      <!-- Badge Orange Premium Gradient -->
       <linearGradient id="badgeGrad" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0%" stop-color="#ff6b00" />
         <stop offset="100%" stop-color="#ff8800" />
       </linearGradient>
     </defs>
 
-    <rect width="1200" height="675" fill="#fcfdfe" />
-    <rect width="1200" height="675" fill="url(#petDoodle)" opacity="0.85" />
+    <!-- Base Canvas -->
+    <rect width="1200" height="675" fill="#f8fafc" />
+    <rect width="1200" height="675" fill="url(#petDoodle)" opacity="0.80" />
+
+    <!-- Frosted Card for High Contrast -->
     <rect x="${cardX}" y="${cardY}" width="${cardWidth}" height="${cardHeight}" rx="24" fill="url(#cardGrad)" stroke="#e2e8f0" stroke-width="2.5" filter="url(#cardShadow)" />
 
-    <g transform="translate(${cardX + (cardWidth - 280) / 2}, ${cardY - 20})">
-      <rect width="280" height="40" rx="20" fill="url(#badgeGrad)" />
-      <text x="140" y="25" text-anchor="middle" font-family="'Montserrat', sans-serif" font-size="13" font-weight="800" fill="#ffffff" letter-spacing="2">🐾 PATISTORE REHBERİ</text>
+    <!-- Top Badge -->
+    <g transform="translate(${cardX + (cardWidth - 300) / 2}, ${cardY - 20})">
+      <rect width="300" height="42" rx="21" fill="url(#badgeGrad)" filter="url(#textDropShadow)" />
+      <text x="150" y="26" text-anchor="middle" font-family="'Montserrat', sans-serif" font-size="13.5" font-weight="900" fill="#ffffff" letter-spacing="2">🐾 PATISTORE UZMAN REHBERİ</text>
     </g>
 
+    <!-- 3D Centered Typography Lines with Strong Drop Shadow -->
     ${textSvgLines}
     ${subtitleSvg}
   </svg>
   `;
 }
 
-// Generate Exactly 2 Ultra-HD Images (1 Featured Cover + 1 In-Content, 1200x675) with Pet Pattern
+// Generate Exactly 2 Ultra-HD Images (1 Featured Cover + 1 In-Content, 1200x675) with Autonomous Prompt Engine
 async function generateUltraHDImages(topic, articleTitle) {
   const focusKw = topic.focus_keyword;
   const baseSlug = slugifyTurkish(focusKw);
   const cleanKw = toTurkishTitleCase(focusKw);
   const finalTitle = toTurkishTitleCase(articleTitle || `${cleanKw}: 2026 Kapsamlı Uzman Rehberi`);
 
-  const inContentText = toTurkishTitleCase(`${cleanKw} Rehberi ve Detaylar`);
-  const inContentSubtitle = "Klinik Analiz ve Uzman Tavsiyeleri";
+  console.log(`    [*] Akıllı Görsel Prompt Motoru çalıştırılıyor (Konu: "${articleTitle}")...`);
+  const autoPrompt = await getAutoImagePrompt(articleTitle || cleanKw);
+  if (autoPrompt) {
+    console.log(`    [+] Üretilen AI Görsel Promptu:\n        "${autoPrompt.substring(0, 160)}..."`);
+  }
+
+  const extractedMainKw = extractKeywordFromPrompt(autoPrompt, cleanKw);
+  console.log(`    [+] Çıkarılan 3D Türkçe Odak Kelime: "${extractedMainKw}"`);
+
+  const inContentText = `${extractedMainKw} DETAYLARI`;
+  const inContentSubtitle = "Klinik Analiz, Bakım Standartları ve Uzman Tavsiyeleri";
   const inContentAlt = toTurkishTitleCase(`${cleanKw} Detaylı Rehberi ve 2026 Uzman Tavsiyeleri`);
   const inContentCaption = `${cleanKw} hakkında en çok merak edilenler ve uzman değerlendirmesi`;
 
   const configs = [
     {
-      mainText: cleanKw,
+      mainText: extractedMainKw,
       subText: finalTitle,
-      alt: cleanKw,
+      alt: extractedMainKw,
       caption: finalTitle,
       filename: `${baseSlug}-kapak-gorseli-patistore.jpg`
     },
@@ -589,10 +674,10 @@ async function generateUltraHDImages(topic, articleTitle) {
 
   for (let idx = 0; idx < configs.length; idx++) {
     const cfg = configs[idx];
-    console.log(`    [*] 16:9 Sevimli Pati Desenli Görsel ${idx + 1}/2 Üretiliyor (Yazı: "${cfg.mainText}")`);
+    console.log(`    [*] 16:9 Yüksek Kontrastlı 3D Tipografi Görseli ${idx + 1}/2 Üretiliyor ("${cfg.mainText}")`);
 
     try {
-      const svgString = generatePetPatternSvg(cfg.mainText, cfg.subText);
+      const svgString = generate3DTypographySvg(cfg.mainText, cfg.subText);
       const svgBuffer = Buffer.from(svgString);
 
       let jpgBuffer;
