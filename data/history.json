@@ -61,9 +61,10 @@
     "iran-kedisi-persian-uzun-tuy-bakimi-goz-temizligi-ve-sagligi",
     "apartmanda-kopek-beslemek-en-sessiz-ve-uyumlu-7-kopek-irki",
     "bahcelievler-istanbul-pet-shop",
-    "chihuahua-sivava-kucuk-irk-sagligi-beslenmesi-ve-bakimi"
+    "chihuahua-sivava-kucuk-irk-sagligi-beslenmesi-ve-bakimi",
+    "bahcelievler-istanbul-pet-kuafor"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "breed"
+  "last_mode": "local_service"
 }
