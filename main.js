@@ -647,6 +647,89 @@ function generate3DTypographySvg(mainKeyword, subtitle = '', sceneDescription = 
 }
 
 // Generate Exactly 2 Ultra-HD Images (1 Featured Cover + 1 In-Content, 1200x675) with Autonomous Prompt Engine
+// Fetch real AI image from Flux.1 engine with timeout protection
+async function fetchRealAiPhoto(promptText) {
+  try {
+    const cleanPrompt = encodeURIComponent(promptText);
+    const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1200&height=675&nologo=true&model=flux`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 35000);
+
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
+
+    if (res.ok) {
+      const buf = Buffer.from(await res.arrayBuffer());
+      if (buf && buf.length > 5000) {
+        return buf;
+      }
+    }
+  } catch (e) {
+    console.warn(`    [!] Flux AI görsel motoru uyarısı: ${e.message}`);
+  }
+  return null;
+}
+
+// Generate 3D Typography Overlay SVG for Real AI Photos
+function generate3DPhotoOverlaySvg(mainText, subText) {
+  const upperText = (mainText || '').toLocaleUpperCase('tr-TR');
+  const lines = wrapBannerText(upperText, 24);
+
+  let fontSize = 52;
+  if (lines.length > 2) fontSize = 42;
+
+  const lineHeight = fontSize * 1.25;
+  const totalHeight = lines.length * lineHeight;
+  const startY = 675 - totalHeight - 65;
+
+  const textSvgLines = lines.map((line, idx) => {
+    const yPos = startY + (idx * lineHeight);
+    return `<text x="60" y="${yPos}" font-family="'Montserrat', 'Arial Black', sans-serif" font-size="${fontSize}" font-weight="900" fill="#ffffff" letter-spacing="2" filter="url(#textDropShadow)">${escapeXml(line)}</text>`;
+  }).join('\n');
+
+  const subtitleSvg = subText
+    ? `<text x="60" y="${startY + totalHeight + 15}" font-family="'Inter', -apple-system, sans-serif" font-size="20" font-weight="700" fill="#f1f5f9" letter-spacing="1" filter="url(#textDropShadow)">${escapeXml(subText)}</text>`
+    : '';
+
+  return `
+  <svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Dark Vignette for Ultra High Contrast Text Legibility -->
+      <linearGradient id="bottomVignette" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="rgba(0,0,0,0)" />
+        <stop offset="35%" stop-color="rgba(15,23,42,0.35)" />
+        <stop offset="100%" stop-color="rgba(15,23,42,0.92)" />
+      </linearGradient>
+
+      <!-- Badge Orange Premium Gradient -->
+      <linearGradient id="badgeGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#ff6b00" />
+        <stop offset="100%" stop-color="#ff8800" />
+      </linearGradient>
+
+      <!-- 3D Ultra-Strong Drop Shadow -->
+      <filter id="textDropShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="rgba(0,0,0,0.9)" />
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.8)" />
+      </filter>
+    </defs>
+
+    <!-- Dark gradient over bottom 50% for text contrast -->
+    <rect y="275" width="1200" height="400" fill="url(#bottomVignette)" />
+
+    <!-- Top Badge -->
+    <g transform="translate(60, 48)">
+      <rect width="280" height="38" rx="19" fill="url(#badgeGrad)" filter="url(#textDropShadow)" />
+      <text x="140" y="24" text-anchor="middle" font-family="'Montserrat', sans-serif" font-size="13" font-weight="900" fill="#ffffff" letter-spacing="2">🐾 PATISTORE UZMAN REHBERİ</text>
+    </g>
+
+    <!-- 3D High Contrast White Typography -->
+    ${textSvgLines}
+    ${subtitleSvg}
+  </svg>`;
+}
+
+// Generate Exactly 2 Ultra-HD Images (1 Featured Cover + 1 In-Content, 1200x675) with Autonomous Prompt Engine & Flux.1
 async function generateUltraHDImages(topic, articleTitle) {
   const focusKw = topic.focus_keyword;
   const baseSlug = slugifyTurkish(focusKw);
@@ -673,14 +756,16 @@ async function generateUltraHDImages(topic, articleTitle) {
       subText: finalTitle,
       alt: extractedMainKw,
       caption: finalTitle,
-      filename: `${baseSlug}-kapak-gorseli-patistore.jpg`
+      filename: `${baseSlug}-kapak-gorseli-patistore.jpg`,
+      prompt: autoPrompt || `16:9 commercial photorealistic pet photography of ${focusKw}`
     },
     {
       mainText: inContentText,
       subText: inContentSubtitle,
       alt: inContentAlt,
       caption: inContentCaption,
-      filename: `${baseSlug}-detay-rehberi-patistore.jpg`
+      filename: `${baseSlug}-detay-rehberi-patistore.jpg`,
+      prompt: autoPrompt ? `${autoPrompt} close up macro photography detail` : `16:9 detailed veterinary clinic pet care photography of ${focusKw}`
     }
   ];
 
@@ -688,23 +773,42 @@ async function generateUltraHDImages(topic, articleTitle) {
 
   for (let idx = 0; idx < configs.length; idx++) {
     const cfg = configs[idx];
-    console.log(`    [*] 16:9 Yüksek Kontrastlı 3D Tipografi Görseli ${idx + 1}/2 Üretiliyor ("${cfg.mainText}")`);
+    console.log(`    [*] 16:9 Gerçekçi AI Görseli ${idx + 1}/2 Üretiliyor ("${cfg.mainText}")...`);
 
     try {
-      const svgString = generate3DTypographySvg(cfg.mainText, cfg.subText);
-      const svgBuffer = Buffer.from(svgString);
+      let finalJpgBuffer = null;
 
-      let jpgBuffer;
-      if (sharp) {
-        jpgBuffer = await sharp(svgBuffer)
-          .resize(1200, 675)
-          .jpeg({ quality: 92 })
-          .toBuffer();
-      } else {
-        jpgBuffer = svgBuffer;
+      // 1. Try to fetch real AI photo from Flux.1
+      const photoBuffer = await fetchRealAiPhoto(cfg.prompt);
+
+      if (photoBuffer) {
+        console.log(`    [✓] Flux.1 AI Gerçekçi Fotoğrafı İndirildi (${photoBuffer.length} bytes)!`);
+        if (sharp) {
+          const overlaySvg = generate3DPhotoOverlaySvg(cfg.mainText, cfg.subText);
+          finalJpgBuffer = await sharp(photoBuffer)
+            .resize(1200, 675)
+            .composite([{ input: Buffer.from(overlaySvg), top: 0, left: 0 }])
+            .jpeg({ quality: 92 })
+            .toBuffer();
+          console.log(`    [✓] 3D Türkçe Tipografi & Kontrast Katmanı Fotoğrafa İşlendi!`);
+        } else {
+          finalJpgBuffer = photoBuffer;
+        }
       }
 
-      const uploaded = await uploadImage(jpgBuffer, cfg.filename, cfg.alt, cfg.caption);
+      // 2. Fallback to 3D typography vector card if Flux times out
+      if (!finalJpgBuffer) {
+        console.log(`    [*] Yedek 3D Tipografi Kartı Üretiliyor...`);
+        const svgString = generate3DTypographySvg(cfg.mainText, cfg.subText);
+        const svgBuffer = Buffer.from(svgString);
+        if (sharp) {
+          finalJpgBuffer = await sharp(svgBuffer).resize(1200, 675).jpeg({ quality: 92 }).toBuffer();
+        } else {
+          finalJpgBuffer = svgBuffer;
+        }
+      }
+
+      const uploaded = await uploadImage(finalJpgBuffer, cfg.filename, cfg.alt, cfg.caption);
       if (uploaded) {
         results.push({
           id: uploaded.id,
