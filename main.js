@@ -307,28 +307,41 @@ function decodeHtmlEntities(str) {
     .replace(/&gt;/g, '>');
 }
 
-// Calculate Dice coefficient similarity between two strings (0.0 to 1.0)
-function calculateStringSimilarity(str1, str2) {
-  const s1 = slugifyTurkish(str1).replace(/-/g, ' ');
-  const s2 = slugifyTurkish(str2).replace(/-/g, ' ');
-  if (s1 === s2) return 1.0;
-  if (s1.length < 2 || s2.length < 2) return 0.0;
+// Calculate similarity between two titles with core subject protection (prevents boilerplate suffix false positives)
+function getCoreSubject(title) {
+  const parts = (title || '').split(/[:|\-–—]/);
+  return parts[0].trim();
+}
 
-  const getBigrams = (str) => {
+function calculateStringSimilarity(str1, str2) {
+  const core1 = slugifyTurkish(getCoreSubject(str1)).replace(/-/g, ' ').trim();
+  const core2 = slugifyTurkish(getCoreSubject(str2)).replace(/-/g, ' ').trim();
+  const full1 = slugifyTurkish(str1).replace(/-/g, ' ').trim();
+  const full2 = slugifyTurkish(str2).replace(/-/g, ' ').trim();
+
+  if (core1 === core2) return 1.0;
+  if (full1 === full2) return 1.0;
+
+  const calcDice = (s1, s2) => {
+    if (s1 === s2) return 1.0;
+    if (s1.length < 2 || s2.length < 2) return 0.0;
     const bigrams = new Set();
-    for (let i = 0; i < str.length - 1; i++) {
-      bigrams.add(str.substring(i, i + 2));
+    for (let i = 0; i < s1.length - 1; i++) bigrams.add(s1.substring(i, i + 2));
+    const b2 = new Set();
+    for (let i = 0; i < s2.length - 1; i++) b2.add(s2.substring(i, i + 2));
+    let intersection = 0;
+    for (const b of bigrams) {
+      if (b2.has(b)) intersection++;
     }
-    return bigrams;
+    return (2.0 * intersection) / (bigrams.size + b2.size);
   };
 
-  const b1 = getBigrams(s1);
-  const b2 = getBigrams(s2);
-  let intersection = 0;
-  for (const b of b1) {
-    if (b2.has(b)) intersection++;
-  }
-  return (2.0 * intersection) / (b1.size + b2.size);
+  const coreDice = calcDice(core1, core2);
+  const fullDice = calcDice(full1, full2);
+
+  if (coreDice >= 0.70) return coreDice;
+  if (fullDice >= 0.85 && coreDice >= 0.40) return fullDice;
+  return Math.min(coreDice, fullDice);
 }
 
 // Get or create category with HTML entity decoding and Uncategorized prevention
@@ -933,11 +946,13 @@ async function selectNextTask(history) {
   const livePublishedSlugs = new Set(history.published_slugs || []);
   const livePublishedTitles = [];
   try {
-    const res = await fetch(`${WP_URL}/wp-json/wp/v2/posts?per_page=100&_fields=slug,title`, {
-      headers: { 'Authorization': AUTH_HEADER }
-    });
-    if (res.ok) {
+    for (let pageNum = 1; pageNum <= 3; pageNum++) {
+      const res = await fetch(`${WP_URL}/wp-json/wp/v2/posts?per_page=100&page=${pageNum}&_fields=slug,title`, {
+        headers: { 'Authorization': AUTH_HEADER }
+      });
+      if (!res.ok) break;
       const livePosts = await res.json();
+      if (!livePosts || !livePosts.length) break;
       for (const p of livePosts) {
         if (p.slug) {
           livePublishedSlugs.add(p.slug.toLowerCase());
