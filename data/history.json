@@ -201,7 +201,8 @@
     "kucukcekmece-istanbul-pet-shop",
     "kucukcekmece-istanbul-pet-kuafor",
     "basaksehir-istanbul-veteriner-klinigi",
-    "basaksehir-istanbul-pet-otel"
+    "basaksehir-istanbul-pet-otel",
+    "basaksehir-istanbul-pet-taksi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
