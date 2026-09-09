@@ -188,10 +188,9 @@
     "dogru-kedi-kumu-konfor-ve-mutlu-kediler",
     "kedilerle-yasamin-ilk-adimi-yavru-kedi",
     "dogru-kedi-secimi-yaparken-bunlara-dikkat-edin",
-    "3-adimda-tuy-dokulmesi-sorununun-cozumu",
-    "van-kedisi-goz-yapisi-yuzme-aliskanligi-ve-bakim-rehberi"
+    "3-adimda-tuy-dokulmesi-sorununun-cozumu"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
-  "last_mode": "breed"
+  "last_mode": "local_service"
 }
