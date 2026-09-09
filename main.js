@@ -314,34 +314,32 @@ function getCoreSubject(title) {
 }
 
 function calculateStringSimilarity(str1, str2) {
-  const core1 = slugifyTurkish(getCoreSubject(str1)).replace(/-/g, ' ').trim();
-  const core2 = slugifyTurkish(getCoreSubject(str2)).replace(/-/g, ' ').trim();
-  const full1 = slugifyTurkish(str1).replace(/-/g, ' ').trim();
-  const full2 = slugifyTurkish(str2).replace(/-/g, ' ').trim();
+  const s1 = slugifyTurkish(str1).replace(/-/g, ' ');
+  const s2 = slugifyTurkish(str2).replace(/-/g, ' ');
+  if (s1 === s2) return 1.0;
 
+  const core1 = slugifyTurkish(getCoreSubject(str1)).replace(/-/g, ' ');
+  const core2 = slugifyTurkish(getCoreSubject(str2)).replace(/-/g, ' ');
   if (core1 === core2) return 1.0;
-  if (full1 === full2) return 1.0;
 
-  const calcDice = (s1, s2) => {
-    if (s1 === s2) return 1.0;
-    if (s1.length < 2 || s2.length < 2) return 0.0;
+  const w1 = core1.split(' ').filter(w => !['kedisi', 'kopegi', 'bakimi', 'egitimi', 'beslenmesi', 'pet', 'istanbul', 'rehberi', 'fiyatlari', '2026'].includes(w));
+  const w2 = core2.split(' ').filter(w => !['kedisi', 'kopegi', 'bakimi', 'egitimi', 'beslenmesi', 'pet', 'istanbul', 'rehberi', 'fiyatlari', '2026'].includes(w));
+
+  const hasCommonEntity = w1.some(w => w2.includes(w));
+  if (w1.length > 0 && w2.length > 0 && !hasCommonEntity) {
+    return 0.1; // Different subjects (different breeds, districts, etc.)
+  }
+
+  const getBigrams = (str) => {
     const bigrams = new Set();
-    for (let i = 0; i < s1.length - 1; i++) bigrams.add(s1.substring(i, i + 2));
-    const b2 = new Set();
-    for (let i = 0; i < s2.length - 1; i++) b2.add(s2.substring(i, i + 2));
-    let intersection = 0;
-    for (const b of bigrams) {
-      if (b2.has(b)) intersection++;
-    }
-    return (2.0 * intersection) / (bigrams.size + b2.size);
+    for (let i = 0; i < str.length - 1; i++) bigrams.add(str.substring(i, i + 2));
+    return bigrams;
   };
-
-  const coreDice = calcDice(core1, core2);
-  const fullDice = calcDice(full1, full2);
-
-  if (coreDice >= 0.70) return coreDice;
-  if (fullDice >= 0.85 && coreDice >= 0.40) return fullDice;
-  return Math.min(coreDice, fullDice);
+  const b1 = getBigrams(s1);
+  const b2 = getBigrams(s2);
+  let intersection = 0;
+  for (const b of b1) if (b2.has(b)) intersection++;
+  return (2.0 * intersection) / (b1.size + b2.size);
 }
 
 // Get or create category with HTML entity decoding and Uncategorized prevention
@@ -732,7 +730,7 @@ function generateDiverseTitle(rawTitle, focusKw, mode) {
 
   const cleanKw = toTurkishTitleCase(focusKw);
 
-  if (isBanned || title.length < 15 || !title.toLowerCase().includes(focusKw.toLowerCase())) {
+  if (isBanned || title.length < 15 || !title.toLowerCase().includes(focusKw.toLowerCase()) || title.includes('2026 Kapsamlı Uzman Rehberi ve Klinik Tavsiyeler')) {
     const localTemplates = [
       `${cleanKw}: 2026 Güncel Fiyatları, Hizmet Detayları ve Doğru Seçim Rehberi`,
       `${cleanKw}: En Güvenilir Tavsiyeler, Kullanıcı Yorumları ve İpuçları (2026)`,
