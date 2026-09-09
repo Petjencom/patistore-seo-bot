@@ -205,7 +205,8 @@
     "buyukcekmece-istanbul-pet-shop",
     "buyukcekmece-istanbul-pet-kuafor",
     "sancaktepe-istanbul-veteriner-klinigi",
-    "sancaktepe-istanbul-pet-otel"
+    "sancaktepe-istanbul-pet-otel",
+    "sancaktepe-istanbul-pet-taksi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
