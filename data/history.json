@@ -206,7 +206,8 @@
     "basaksehir-istanbul-pet-shop",
     "basaksehir-istanbul-pet-kuafor",
     "avcilar-istanbul-veteriner-klinigi",
-    "avcilar-istanbul-pet-otel"
+    "avcilar-istanbul-pet-otel",
+    "avcilar-istanbul-pet-taksi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
