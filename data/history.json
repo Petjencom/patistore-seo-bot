@@ -213,7 +213,8 @@
     "cekmekoy-istanbul-pet-otel",
     "cekmekoy-istanbul-pet-taksi",
     "cekmekoy-istanbul-pet-shop",
-    "cekmekoy-istanbul-pet-kuafor"
+    "cekmekoy-istanbul-pet-kuafor",
+    "esenyurt-istanbul-veteriner-klinigi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
