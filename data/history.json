@@ -221,7 +221,8 @@
     "esenyurt-istanbul-pet-kuafor",
     "silivri-istanbul-veteriner-klinigi",
     "silivri-istanbul-pet-otel",
-    "silivri-istanbul-pet-taksi"
+    "silivri-istanbul-pet-taksi",
+    "silivri-istanbul-pet-shop"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
