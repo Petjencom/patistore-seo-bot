@@ -192,7 +192,8 @@
     "gungoren-istanbul-pet-shop",
     "gungoren-istanbul-pet-kuafor",
     "esenler-istanbul-veteriner-klinigi",
-    "esenler-istanbul-pet-otel"
+    "esenler-istanbul-pet-otel",
+    "esenler-istanbul-pet-taksi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
