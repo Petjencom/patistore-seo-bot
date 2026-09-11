@@ -322,8 +322,17 @@ function calculateStringSimilarity(str1, str2) {
   const core2 = slugifyTurkish(getCoreSubject(str2)).replace(/-/g, ' ');
   if (core1 === core2) return 1.0;
 
-  const w1 = core1.split(' ').filter(w => !['kedisi', 'kopegi', 'bakimi', 'egitimi', 'beslenmesi', 'pet', 'istanbul', 'rehberi', 'fiyatlari', '2026'].includes(w));
-  const w2 = core2.split(' ').filter(w => !['kedisi', 'kopegi', 'bakimi', 'egitimi', 'beslenmesi', 'pet', 'istanbul', 'rehberi', 'fiyatlari', '2026'].includes(w));
+  const genericWords = [
+    'kedisi', 'kopegi', 'kedi', 'kopek', 'kus', 'papagan', 'surungen',
+    'bakimi', 'egitimi', 'beslenmesi', 'sagligi', 'hastaliklari',
+    'veteriner', 'klinigi', 'klinik', 'kuafor', 'kuaforu', 'kuaför',
+    'taksi', 'takside', 'otel', 'oteli', 'pansiyon', 'shop', 'hizmetleri',
+    'pet', 'istanbul', 'rehberi', 'fiyatlari', '2026', 'uzman', 'kapsamli',
+    'tavsiyeler', 'onerileri', 'incelemesi', 'secimi', 'seciminde'
+  ];
+
+  const w1 = core1.split(' ').filter(w => w.length > 2 && !genericWords.includes(w));
+  const w2 = core2.split(' ').filter(w => w.length > 2 && !genericWords.includes(w));
 
   const hasCommonEntity = w1.some(w => w2.includes(w));
   if (w1.length > 0 && w2.length > 0 && !hasCommonEntity) {
