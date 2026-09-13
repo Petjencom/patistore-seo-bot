@@ -322,30 +322,31 @@ function calculateStringSimilarity(str1, str2) {
   const core2 = slugifyTurkish(getCoreSubject(str2)).replace(/-/g, ' ');
   if (core1 === core2) return 1.0;
 
-  const genericWords = [
-    'kedisi', 'kopegi', 'kedi', 'kopek', 'kus', 'papagan', 'surungen',
-    'bakimi', 'egitimi', 'beslenmesi', 'sagligi', 'hastaliklari',
-    'veteriner', 'klinigi', 'klinik', 'kuafor', 'kuaforu', 'kuaför',
-    'taksi', 'takside', 'otel', 'oteli', 'pansiyon', 'shop', 'hizmetleri',
-    'pet', 'istanbul', 'rehberi', 'fiyatlari', '2026', 'uzman', 'kapsamli',
-    'tavsiyeler', 'onerileri', 'incelemesi', 'secimi', 'seciminde'
-  ];
+  // Differentiate service types so e.g. "Bayrampaşa Veteriner" vs "Bayrampaşa Pet Taksi" are not confused
+  const getServiceType = (text) => {
+    if (/veteriner|klinik|asi|tedavi|cerrahi/i.test(text)) return 'vet';
+    if (/taksi|nakil|transfer|tasima/i.test(text)) return 'taxi';
+    if (/kuafor|tras|banyo|bakim/i.test(text)) return 'grooming';
+    if (/otel|pansiyon|kres|konaklama/i.test(text)) return 'hotel';
+    if (/shop|magaza|malzeme|mama/i.test(text)) return 'shop';
+    return null;
+  };
 
-  const w1 = core1.split(' ').filter(w => w.length > 2 && !genericWords.includes(w));
-  const w2 = core2.split(' ').filter(w => w.length > 2 && !genericWords.includes(w));
-
-  const hasCommonEntity = w1.some(w => w2.includes(w));
-  if (w1.length > 0 && w2.length > 0 && !hasCommonEntity) {
-    return 0.1; // Different subjects (different breeds, districts, etc.)
+  const srv1 = getServiceType(core1);
+  const srv2 = getServiceType(core2);
+  if (srv1 && srv2 && srv1 !== srv2) {
+    return 0.05; // Different services in the same or different district are distinct topics!
   }
 
+  // Calculate similarity on core subject bigrams to avoid boilerplate subtitle collision
   const getBigrams = (str) => {
     const bigrams = new Set();
     for (let i = 0; i < str.length - 1; i++) bigrams.add(str.substring(i, i + 2));
     return bigrams;
   };
-  const b1 = getBigrams(s1);
-  const b2 = getBigrams(s2);
+  const b1 = getBigrams(core1);
+  const b2 = getBigrams(core2);
+  if (b1.size === 0 || b2.size === 0) return 0.0;
   let intersection = 0;
   for (const b of b1) if (b2.has(b)) intersection++;
   return (2.0 * intersection) / (b1.size + b2.size);
