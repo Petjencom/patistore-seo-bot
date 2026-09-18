@@ -249,7 +249,8 @@
     "cubuk-ankara-pet-kuafor",
     "beypazari-ankara-pet-otel",
     "beypazari-ankara-pet-taksi",
-    "beypazari-ankara-pet-shop"
+    "beypazari-ankara-pet-shop",
+    "beypazari-ankara-pet-kuafor"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
