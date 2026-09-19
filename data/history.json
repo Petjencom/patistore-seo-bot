@@ -274,7 +274,8 @@
     "bayrakli-izmir-pet-kuafor",
     "cigli-izmir-pet-otel",
     "cigli-izmir-pet-taksi",
-    "cigli-izmir-pet-shop"
+    "cigli-izmir-pet-shop",
+    "cigli-izmir-pet-kuafor"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
