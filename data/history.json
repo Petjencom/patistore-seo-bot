@@ -282,7 +282,8 @@
     "gaziemir-izmir-pet-kuafor",
     "balcova-izmir-pet-otel",
     "balcova-izmir-pet-taksi",
-    "balcova-izmir-pet-shop"
+    "balcova-izmir-pet-shop",
+    "balcova-izmir-pet-kuafor"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
