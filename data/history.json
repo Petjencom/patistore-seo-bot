@@ -290,7 +290,8 @@
     "urla-izmir-pet-kuafor",
     "cesme-izmir-pet-otel",
     "cesme-izmir-pet-taksi",
-    "cesme-izmir-pet-shop"
+    "cesme-izmir-pet-shop",
+    "cesme-izmir-pet-kuafor"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
