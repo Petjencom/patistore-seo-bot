@@ -293,7 +293,8 @@
     "cesme-izmir-pet-shop",
     "cesme-izmir-pet-kuafor",
     "narlidere-izmir-veteriner-klinigi",
-    "narlidere-izmir-pet-otel"
+    "narlidere-izmir-pet-otel",
+    "narlidere-izmir-pet-taksi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
