@@ -316,7 +316,8 @@
     "foca-izmir-pet-otel",
     "foca-izmir-pet-taksi",
     "foca-izmir-pet-shop",
-    "aliaga-izmir-pet-otel"
+    "aliaga-izmir-pet-otel",
+    "aliaga-izmir-pet-taksi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
