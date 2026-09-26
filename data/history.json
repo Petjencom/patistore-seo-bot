@@ -319,7 +319,8 @@
     "aliaga-izmir-pet-otel",
     "aliaga-izmir-pet-taksi",
     "aliaga-izmir-pet-shop",
-    "menderes-izmir-pet-otel"
+    "menderes-izmir-pet-otel",
+    "menderes-izmir-pet-taksi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
