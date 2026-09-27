@@ -325,7 +325,8 @@
     "odemis-izmir-pet-otel",
     "odemis-izmir-pet-taksi",
     "odemis-izmir-pet-shop",
-    "tire-izmir-pet-otel"
+    "tire-izmir-pet-otel",
+    "tire-izmir-pet-taksi"
   ],
   "last_run": "2026-09-04T02:00:16.799Z",
   "last_type": "evergreen",
